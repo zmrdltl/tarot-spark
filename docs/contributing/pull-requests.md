@@ -21,7 +21,7 @@ Use `docs/contributing/pr-review.md` for review criteria.
 - Keep the PR scoped to the linked issue or stated goal.
 - Confirm commits satisfy `docs/contributing/commit-messages.md` before pushing
   or opening a PR.
-- Fix every unsigned or unsigned-off commit before requesting review.
+- Fix every commit missing sign-off before requesting review.
 - Fill out `.github/pull_request_template.md`.
 - Replace every placeholder with a concrete note or `N/A`.
 

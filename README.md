@@ -16,6 +16,7 @@ Run the required quality gates before opening or updating a PR:
 ```sh
 pnpm run format:check
 pnpm run lint
+pnpm run docs:lint
 pnpm run typecheck
 pnpm run test
 pnpm run build

@@ -25,6 +25,8 @@ jobs:
             command: pnpm run format:check
           - name: Lint
             command: pnpm run lint
+          - name: Docs Lint
+            command: pnpm run docs:lint
           - name: Typecheck
             command: pnpm run typecheck
           - name: Test

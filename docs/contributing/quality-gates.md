@@ -11,6 +11,7 @@ For code-bearing changes, run:
 ```text
 pnpm run format:check
 pnpm run lint
+pnpm run docs:lint
 pnpm run typecheck
 pnpm run test
 ```
@@ -31,4 +32,5 @@ configuration.
 ## CI
 
 - Add CI only after the project has matching package scripts.
-- CI should run the required checks for pull requests and protected branch updates.
+- CI should run the required checks for pull requests and protected branch
+  updates.

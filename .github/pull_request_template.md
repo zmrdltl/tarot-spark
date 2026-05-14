@@ -18,10 +18,11 @@ Commands run:
 
 - [ ] `pnpm run format:check`
 - [ ] `pnpm run lint`
+- [ ] `pnpm run docs:lint`
 - [ ] `pnpm run typecheck`
 - [ ] `pnpm run test`
 - [ ] `pnpm run build`
-- [ ] Commit signatures and sign-off trailers satisfy `docs/contributing/commit-messages.md`
+- [ ] Commit sign-off trailers satisfy `docs/contributing/commit-messages.md`
 
 N/A reason:
 
