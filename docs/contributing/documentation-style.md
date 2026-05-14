@@ -10,7 +10,7 @@ contributor-facing docs.
 - Keep docs short and task-focused.
 - Prefer stable rules over plans or brainstormed ideas.
 - Use plain language and concrete defaults.
-- Avoid repeated rules; link to the source rule instead.
+- Avoid duplicate rules and copy; link to the source rule instead.
 - Use a consistent, direct tone.
 - State rules as actions, not commentary about the author or process.
 
