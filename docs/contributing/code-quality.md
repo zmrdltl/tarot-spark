@@ -6,6 +6,7 @@
 - Keep the app static-first for MVP work.
 - Prefer typed local data for cards, spreads, prompts, and interpretation templates.
 - Prefer small, focused components and plain data structures before adding abstractions.
+- Keep one source of truth for repeated code, data, and UI copy.
 - Use plain function components for React UI; avoid class components and avoid
   `React.FC` unless there is a concrete typing benefit.
 
