@@ -12,16 +12,16 @@ Use this rule for deciding how a PR is brought into `main`.
   are ready to preserve.
 - Use "Squash and merge" when the branch contains noisy fixup commits that
   should become one commit and the final squash commit will include the required
-  cryptographic signature and `Signed-off-by` trailer.
+  `Signed-off-by` trailer.
 - Do not use "Squash and merge" when the generated squash commit would fail
-  signed-commit or sign-off branch protection.
+  sign-off branch protection.
 - Avoid merge commits unless there is a specific reason to preserve branch topology.
 
 ## Before Merge
 
 - Confirm the PR satisfies the linked issue, PR goal, or stated scope.
 - Confirm required checks pass or unavailable checks have a documented N/A reason.
-- Confirm commit messages, signatures, and sign-off trailers satisfy
+- Confirm commit messages and sign-off trailers satisfy
   `docs/contributing/commit-messages.md`.
 - Confirm remaining risks are documented.
 - Confirm issue-closing keywords are present only when the issue should close on

@@ -41,7 +41,7 @@ A code-bearing PR is ready only when:
 - The scoped user flow works.
 - Required checks pass or unavailable checks have a documented N/A reason.
 - Relevant tests or smoke coverage exist.
-- Commit messages, signatures, and sign-off trailers satisfy
+- Commit messages and sign-off trailers satisfy
   `docs/contributing/commit-messages.md`.
 - Product and content guardrails are satisfied.
 - Remaining risks are documented in the PR.

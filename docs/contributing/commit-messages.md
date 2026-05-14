@@ -7,14 +7,16 @@ Use this rule when creating or reviewing Git commit messages.
 ## Commit Creation
 
 - Do not run `git commit` unless the user explicitly asks for a commit.
-- Use `git commit -S -s` for every commit so branch protection checks receive a
-  cryptographic signature and a `Signed-off-by` trailer.
-- Use `git commit --amend -S -s --no-edit` only when the latest local commit is
-  missing the signature or trailer.
-- Rewrite local history to sign every unsigned commit and add the trailer before
-  pushing or updating a PR.
-- Re-sign commits and preserve `Signed-off-by` trailers when rebasing,
-  squashing, or amending commits.
+- Use `git commit -s` for every commit so branch protection checks receive a
+  `Signed-off-by` trailer.
+- Use `git commit -S -s` when signed-commit branch protection is enabled or the
+  current task explicitly requires a cryptographic signature.
+- Use `git commit --amend -s --no-edit` only when the latest local commit is
+  missing the trailer.
+- Rewrite local history to add the trailer to every commit missing sign-off
+  before pushing or updating a PR.
+- Preserve `Signed-off-by` trailers when rebasing, squashing, or amending
+  commits.
 
 ## Subject
 
@@ -96,5 +98,5 @@ Verification:
 - Keep commits scoped to a coherent change.
 - Avoid mixing product plans, code changes, and formatting-only churn in one commit.
 - Prefer follow-up tasks or issues over expanding a branch beyond its original goal.
-- Fix unsigned or unsigned-off commits before review instead of relying on
-  merge-time cleanup.
+- Fix commits missing sign-off before review instead of relying on merge-time
+  cleanup.
