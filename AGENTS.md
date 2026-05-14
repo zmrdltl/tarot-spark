@@ -19,4 +19,6 @@ Keep policy details in `docs/contributing/`; do not duplicate them here.
 
 ## Planning
 
-Plans do not belong in this file. Keep short plans in the current task, and use GitHub Issues only when tracking, collaboration, deferred follow-up, or acceptance criteria need a durable record.
+Plans do not belong in this file. Keep short plans in the current task, and use
+GitHub Issues only when tracking, collaboration, deferred follow-up, or
+acceptance criteria need a durable record.

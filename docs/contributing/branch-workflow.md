@@ -22,6 +22,9 @@ Use `docs/contributing/branch-naming.md` for branch names.
 
 ## Collaboration
 
-- Do not rewrite a shared branch unless every active contributor on that branch agrees.
-- Prefer a new branch when a branch has drifted beyond the original task or issue scope.
-- Document any non-rebase update in the PR, or in the final summary when there is no PR.
+- Do not rewrite a shared branch unless every active contributor on that branch
+  agrees.
+- Prefer a new branch when a branch has drifted beyond the original task or
+  issue scope.
+- Document any non-rebase update in the PR, or in the final summary when there
+  is no PR.

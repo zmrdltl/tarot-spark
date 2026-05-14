@@ -7,7 +7,8 @@ Use this rule when a GitHub Issue is useful or explicitly requested.
 ## When To Create An Issue
 
 - Do not create an issue by default.
-- Create an issue when a plan, roadmap item, feature breakdown, or follow-up needs durable tracking.
+- Create an issue when a plan, roadmap item, feature breakdown, or follow-up
+  needs durable tracking.
 - Create an issue when unclear requirements need acceptance criteria before implementation.
 - Keep small, direct, single-owner work in the current task unless tracking is useful.
 
