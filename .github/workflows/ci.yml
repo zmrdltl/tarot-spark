@@ -31,6 +31,9 @@ jobs:
             command: pnpm run typecheck
           - name: Test
             command: pnpm run test
+          - name: E2E
+            command: pnpm run test:e2e
+            playwright: true
           - name: Build
             command: pnpm run build
 
@@ -53,6 +56,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        if: ${{ matrix.playwright == true }}
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run ${{ matrix.name }}
         run: ${{ matrix.command }}

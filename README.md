@@ -10,6 +10,7 @@ Use Node.js 24+ and the pinned pnpm version for local development and CI.
 corepack enable
 corepack prepare pnpm@11.1.1 --activate
 pnpm install
+pnpm exec playwright install chromium
 pnpm dev
 ```
 
@@ -30,5 +31,6 @@ pnpm run lint
 pnpm run docs:lint
 pnpm run typecheck
 pnpm run test
+pnpm run test:e2e
 pnpm run build
 ```

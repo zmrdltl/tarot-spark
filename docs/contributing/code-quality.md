@@ -30,7 +30,10 @@
 ## Testing Expectations
 
 - Add or update tests for changed logic and important user flows.
-- Use Playwright for smoke coverage of core flows once the app is scaffolded.
+- Use Vitest for unit and component coverage of changed logic, rendering states,
+  and local helpers.
+- Use Playwright for end-to-end smoke coverage of core flows once the app is
+  scaffolded.
 - Core smoke flows should cover page load, card draw, result reveal, prompt copy,
   and share entry points.
 - Keep tests deterministic; do not depend on live ads, live analytics dashboards,
