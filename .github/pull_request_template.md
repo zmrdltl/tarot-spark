@@ -5,6 +5,11 @@
 - What changed:
 - Why:
 
+## User Flow
+
+- Affected:
+- Not affected:
+
 ## Scope
 
 - Included:
@@ -14,19 +19,26 @@
 
 Follow `docs/contributing/quality-gates.md`.
 
-Commands run:
+Common checks:
 
 - [ ] `pnpm run format:check`
-- [ ] `pnpm run lint`
 - [ ] `pnpm run docs:lint`
+
+Additional code-bearing checks:
+
+- [ ] `pnpm run lint`
 - [ ] `pnpm run typecheck`
 - [ ] `pnpm run test`
 - [ ] `pnpm run build`
+
+PR readiness:
+
 - [ ] Commit sign-off trailers satisfy `docs/contributing/commit-messages.md`
 
-N/A reason:
+N/A or unverified:
 
-- N/A
+- Code-bearing checks N/A reason:
+- Unverified behavior:
 
 ## Review Notes
 

@@ -18,6 +18,15 @@
 - Do not introduce new runtime dependencies unless they directly support the
   current task.
 
+## Data And Content Structure
+
+- Keep card, spread, topic, prompt template, and interpretation data typed.
+- Add new tarot topics through the existing data shape and routing pattern.
+- Keep SEO metadata, visible headings, analytics events, and public copy aligned
+  when adding or changing a user-facing topic.
+- Move repeated tarot content, UI copy, or prompt text to one source of truth
+  before it appears in multiple places.
+
 ## Testing Expectations
 
 - Add or update tests for changed logic and important user flows.

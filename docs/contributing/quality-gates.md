@@ -14,15 +14,19 @@ pnpm run lint
 pnpm run docs:lint
 pnpm run typecheck
 pnpm run test
+pnpm run build
 ```
 
-Run `pnpm run build` before release, deployment, protected branch updates, or
-changes that affect routing, metadata, static generation, dependencies, or build
-configuration.
+For docs-only changes, run:
+
+```text
+pnpm run format:check
+pnpm run docs:lint
+```
 
 ## Exceptions
 
-- For docs-only changes, mark unavailable checks as N/A in the final summary or
+- For docs-only changes, mark code-bearing checks as N/A in the final summary or
   PR and explain why.
 - For pre-scaffold work where these scripts do not exist, mark the checks as N/A
   in the final summary or PR and explain why.
