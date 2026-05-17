@@ -1,4 +1,4 @@
-# Quality Gates
+# Verification Gates
 
 ## Scope
 

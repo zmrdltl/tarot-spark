@@ -3,7 +3,7 @@
 ## Scope
 
 Use this rule when a pull request is useful or explicitly requested.
-Use `docs/contributing/pr-review.md` for review criteria.
+Use `docs/workflow/reviews.md` for review criteria.
 
 ## When To Open A PR
 
@@ -19,8 +19,8 @@ Use `docs/contributing/pr-review.md` for review criteria.
 - Link the PR to its issue when an issue exists.
 - Use Draft PRs for incomplete work that needs early feedback.
 - Keep the PR scoped to the linked issue or stated goal.
-- Confirm commits satisfy `docs/contributing/commit-messages.md` before pushing
-  or opening a PR.
+- Confirm commits satisfy `docs/workflow/commits.md` before pushing or opening a
+  PR.
 - Fix every commit missing sign-off before requesting review.
 - Fill out `.github/pull_request_template.md`.
 - Replace every placeholder with a concrete note or `N/A`.

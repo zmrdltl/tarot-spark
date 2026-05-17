@@ -37,7 +37,8 @@
 
 ## Monetization
 
-- Treat AdSense approval as a quality gate, not a first-day dependency.
+- Treat AdSense approval as a product readiness gate, not a first-day
+  dependency.
 - Before applying for AdSense, provide useful original content and required
   public pages: About, Privacy, Contact, and Disclaimer.
 - Do not add intrusive ad placements that block card selection, result reading,

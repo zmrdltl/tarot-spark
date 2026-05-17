@@ -1,4 +1,4 @@
-# Code Quality
+# Code Standards
 
 ## Defaults
 
@@ -22,9 +22,9 @@
 
 - Problem fixes must address the root cause, not only hide or work around the
   visible symptom.
-- Before changing code for a bug or review finding, identify the failed contract:
-  state, input, output, permission, accessibility, analytics, policy, or user
-  flow.
+- Before changing code for a bug or review finding, identify the failed
+  contract: state, input, output, permission, accessibility, analytics,
+  guardrail, or user flow.
 - Do not mark a fix complete when the underlying failed contract can still
   produce the same incorrect behavior through another path.
 - Temporary containment may be used to reduce immediate risk, but it does not

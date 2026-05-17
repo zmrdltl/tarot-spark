@@ -22,7 +22,7 @@ Use this rule for deciding how a PR is brought into `main`.
 - Confirm the PR satisfies the linked issue, PR goal, or stated scope.
 - Confirm required checks pass or unavailable checks have a documented N/A reason.
 - Confirm commit messages and sign-off trailers satisfy
-  `docs/contributing/commit-messages.md`.
+  `docs/workflow/commits.md`.
 - Confirm remaining risks are documented.
 - Confirm issue-closing keywords are present only when the issue should close on
   merge.

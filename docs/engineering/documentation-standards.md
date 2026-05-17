@@ -1,4 +1,4 @@
-# Documentation Style
+# Documentation Standards
 
 ## Scope
 
@@ -34,6 +34,7 @@ contributor-facing docs.
   when possible.
 - Keep headings descriptive and stable.
 - Prefer links to source rules over copying the same rule into multiple documents.
+- Use `docs/README.md` to choose a category before adding or moving documents.
 
 ## File Names
 
@@ -51,7 +52,8 @@ contributor-facing docs.
   process details.
 - Do not use jokes, memes, vague hype, or internal shorthand.
 - Do not mention implementation tools unless the reader needs them to do the work.
-- For credentials, environment values, and public identifiers, follow `docs/contributing/code-quality.md`.
+- For credentials, environment values, and public identifiers, follow
+  `docs/engineering/code-standards.md`.
 
 ## Examples And Placeholders
 
