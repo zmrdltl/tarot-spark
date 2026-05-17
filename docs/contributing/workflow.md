@@ -34,3 +34,9 @@ document quality.
   and public copy.
 - Secrets, private identifiers, generated-by notes, and contributor-irrelevant
   internal notes must stay out of committed files.
+
+## Temporary Files
+
+- Remove task-specific temporary files before finishing work.
+- If a temporary file must remain for debugging or handoff, explain why and where
+  it is in the final summary or PR.
