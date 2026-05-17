@@ -6,6 +6,7 @@ Keep policy details in `docs/contributing/`; do not duplicate them here.
 ## Task Routing
 
 - Workflow choice: read `docs/contributing/workflow.md`.
+- Preflight before file edits: follow `docs/contributing/workflow.md#preflight`.
 - Code changes: read `docs/contributing/code-quality.md` and `docs/contributing/quality-gates.md`.
 - Product, analytics, AdSense, SEO, or tarot content changes: read `docs/contributing/product-guardrails.md`.
 - Issue creation or issue planning: read `docs/contributing/issue-workflow.md`.

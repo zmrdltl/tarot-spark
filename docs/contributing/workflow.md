@@ -12,6 +12,21 @@ document quality.
   the change, run the relevant quality gates, and summarize the result.
 - Keep commits focused even when there is no issue or PR.
 
+## Preflight
+
+- Before the first file edit in a task, read the routed documents from
+  `AGENTS.md` for the work type.
+- For code-bearing changes, read `docs/contributing/code-quality.md` and
+  `docs/contributing/quality-gates.md` before editing.
+- For product, analytics, AdSense, SEO, or tarot content changes, also read
+  `docs/contributing/product-guardrails.md` before editing.
+- For documentation or public copy changes, read
+  `docs/contributing/documentation-style.md` before editing.
+- Acknowledge the preflight before editing by naming the documents read, the
+  intended scope, and the relevant verification gates.
+- If work resumes after a context reset or the task scope changes, repeat the
+  preflight for the new scope before editing more files.
+
 ## Use An Issue When
 
 - A plan, roadmap item, feature breakdown, or deferred follow-up needs durable tracking.
