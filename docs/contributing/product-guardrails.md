@@ -30,6 +30,10 @@
   - `share_click`
 - Analytics events should help answer what users click, where they drop off, and
   which topics lead to result views or prompt copies.
+- Add new event names only when an existing core event cannot describe the
+  behavior.
+- Keep event payloads free of names, birth dates, contact details, and free-form
+  user questions.
 
 ## Monetization
 
@@ -46,4 +50,8 @@
 - Topic pages should have clear metadata, human-readable headings, and useful
   static content.
 - Avoid generating thin pages that differ only by keyword.
+- Add topic pages only when the page can provide distinct intent, copy, and
+  result context.
+- Keep disclaimers visible when a tarot page could be mistaken for professional
+  advice.
 - Result pages should be shareable without exposing personal data.
