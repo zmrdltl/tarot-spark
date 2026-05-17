@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "tarot-spark",
-  description: "Free tarot card drawing and AI prompt generator.",
+  description: "Draw tarot cards and create an AI-ready reflection prompt.",
 };
 
 export default function RootLayout({
