@@ -20,7 +20,7 @@ Review should prioritize:
 - Mobile layout
 - SEO metadata
 - Analytics event correctness
-- Policy or monetization risk
+- Product guardrail or monetization risk
 - Unnecessary complexity
 - Missing or weak tests
 
@@ -32,7 +32,7 @@ Review should prioritize:
 - Prefer small follow-up tasks or issues over expanding a PR beyond its original
   goal.
 - If there are no findings, still mention remaining test gaps or residual risk.
-- Check verification against `docs/contributing/quality-gates.md`.
+- Check verification against `docs/engineering/verification-gates.md`.
 
 ## Ready-To-Merge Baseline
 
@@ -42,7 +42,7 @@ A code-bearing PR is ready only when:
 - Required checks pass or unavailable checks have a documented N/A reason.
 - Relevant tests or smoke coverage exist.
 - Commit messages and sign-off trailers satisfy
-  `docs/contributing/commit-messages.md`.
+  `docs/workflow/commits.md`.
 - Product and content guardrails are satisfied.
 - Remaining risks are documented in the PR.
 

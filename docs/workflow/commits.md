@@ -16,7 +16,7 @@ Use this rule when creating or reviewing Git commit messages.
 - Rewrite local history to add the trailer to every commit missing sign-off
   before pushing or updating a PR.
 - Before amending or rewriting commits on a published or shared branch, follow
-  `docs/contributing/branch-workflow.md`.
+  `docs/workflow/branches.md`.
 - Preserve `Signed-off-by` trailers when rebasing, squashing, or amending
   commits.
 
@@ -29,12 +29,13 @@ Use this rule when creating or reviewing Git commit messages.
 - Do not end the subject with a period.
 - Use `Fix <broken behavior>` for bug fixes.
 - Use `Add <capability>` for new behavior.
-- Use `Update <thing>` or `Tighten <rule>` for behavior or policy changes.
+- Use `Update <thing>` or `Tighten <rule>` for behavior, standards, or guardrail
+  changes.
 
 Good examples:
 
 ```text
-Add contributing rules
+Add workflow rules
 Tighten tarot content guardrails
 Fix result share metadata
 ```
@@ -46,7 +47,7 @@ update stuff
 wip
 Add docs stuff
 Fix result share metadata.
-docs/contributing rules
+docs rules
 ```
 
 ## Body

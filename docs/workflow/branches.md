@@ -1,9 +1,38 @@
-# Branch Workflow
+# Branches
 
 ## Scope
 
-Use this rule for creating, updating, and publishing topic branches.
-Use `docs/contributing/branch-naming.md` for branch names.
+Use this rule for naming, creating, updating, and publishing topic branches.
+Protected branches such as `main` are exempt from topic branch naming rules.
+
+## Naming
+
+- Use the format `<type>-<slug>`.
+- Use lowercase letters, digits, and hyphens only.
+- Hyphen is the only allowed separator.
+- Do not use `/`, `_`, `.`, spaces, emoji, or other symbols.
+- Allowed types are `feature`, `fix`, `docs`, `chore`, `refactor`, and `test`.
+- Keep the slug short but specific enough to show intent.
+
+Valid examples:
+
+```text
+docs-structure
+feature-card-draw
+fix-result-share
+chore-ci-setup
+test-card-flow
+```
+
+Invalid examples:
+
+```text
+docs/structure
+feature/card-draw
+fix_result_share
+docs.structure
+feature-card-draw!
+```
 
 ## Creation
 

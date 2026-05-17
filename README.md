@@ -18,7 +18,12 @@ pnpm exec playwright install chromium
 pnpm dev
 ```
 
-Run the required quality gates before opening or updating a PR.
+## Documentation
+
+- [Docs map](docs/README.md)
+- [Frontend structure](docs/architecture/frontend-structure.md)
+
+Run the required verification gates before opening or updating a PR.
 
 For docs-only changes:
 
