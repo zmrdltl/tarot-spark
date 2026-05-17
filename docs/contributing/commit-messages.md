@@ -15,6 +15,8 @@ Use this rule when creating or reviewing Git commit messages.
   missing the trailer.
 - Rewrite local history to add the trailer to every commit missing sign-off
   before pushing or updating a PR.
+- Before amending or rewriting commits on a published or shared branch, follow
+  `docs/contributing/branch-workflow.md`.
 - Preserve `Signed-off-by` trailers when rebasing, squashing, or amending
   commits.
 

@@ -6,6 +6,9 @@ Use this rule for local verification, CI setup, commit readiness, and PR readine
 
 ## Required Checks
 
+Before running checks, use the Node.js and pnpm versions required by
+`package.json`. `README.md` has setup commands.
+
 For code-bearing changes, run:
 
 ```text
