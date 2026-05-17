@@ -4,9 +4,13 @@ Free tarot card drawing and AI prompt generator built with Next.js.
 
 ## Development
 
-Use Node.js 24+ and the pinned pnpm version for local development and CI.
+Use Node.js 24 LTS and the pinned pnpm version for local development and CI.
+This repository includes `.nvmrc` and `.node-version` for local version
+managers.
 
 ```sh
+nvm install
+nvm use
 corepack enable
 corepack prepare pnpm@11.1.1 --activate
 pnpm install
