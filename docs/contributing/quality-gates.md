@@ -14,8 +14,12 @@ pnpm run lint
 pnpm run docs:lint
 pnpm run typecheck
 pnpm run test
+pnpm run test:e2e
 pnpm run build
 ```
+
+`pnpm run test` runs unit and component tests. `pnpm run test:e2e` runs
+Playwright smoke tests.
 
 For docs-only changes, run:
 
