@@ -1,0 +1,142 @@
+{
+  "promptTemplate": {
+    "spreadLine": "- {positionLabel}: {cardName} ({cardTone}) - {upright}. 성찰 질문: {reflection}",
+    "lines": [
+      "오락과 자기 성찰을 위한 타로 글쓰기 파트너로 응답하세요.",
+      "이 리딩을 의료, 법률, 재정, 투자, 정신건강 조언처럼 제시하지 마세요.",
+      "주제: {topicLabel}",
+      "리딩 목표: {promptLead}",
+      "세 장 스프레드:",
+      "{spread}",
+      "다음 형식으로 간결하게 작성하세요:",
+      "1. 쉬운 말로 정리한 전체 주제.",
+      "2. 각 카드 위치별 통찰 하나.",
+      "3. 현실적인 다음 성찰 질문 하나.",
+      "4. 이 리딩은 전문 조언이 아니라 성찰용이라는 짧은 안내."
+    ]
+  },
+  "topics": {
+    "love": {
+      "label": "연애",
+      "promptLead": "연애 안의 감정 흐름을 차분하고 성찰적인 언어로 살펴보세요.",
+      "resultFrame": "서로 맞닿는 감정, 시간이 필요한 지점, 더 분명히 표현해야 할 마음을 구분해보세요."
+    },
+    "reunion": {
+      "label": "재회",
+      "promptLead": "다시 연결되는 일이 건강하고 적절하며 감정적으로 솔직한지 돌아보세요.",
+      "resultFrame": "달라진 점, 아직 풀리지 않은 점, 조심스럽게 시도할 다음 행동에 집중해보세요."
+    },
+    "feelings": {
+      "label": "상대의 마음",
+      "promptLead": "카드를 타인의 마음에 대한 증거로 보지 않고 감정 신호를 읽어보세요.",
+      "resultFrame": "직감과 추측을 분리한 뒤 지금 주의 깊게 볼 감정을 이름 붙여보세요."
+    },
+    "relationship-flow": {
+      "label": "관계 흐름",
+      "promptLead": "현재 관계의 흐름을 자기 성찰의 관점에서 정리해보세요.",
+      "resultFrame": "관계가 움직이는 방향, 막힌 지점, 단순하게 만들 수 있는 부분을 살펴보세요."
+    },
+    "career-direction": {
+      "label": "커리어 방향",
+      "promptLead": "일과 관련된 에너지, 집중점, 다음 행동을 돌아보는 데 스프레드를 활용하세요.",
+      "resultFrame": "실용적인 성찰로 유지하고 재정 또는 전문 조언처럼 다루지 마세요."
+    }
+  },
+  "spreadPositions": {
+    "spark": {
+      "label": "불씨"
+    },
+    "shadow": {
+      "label": "그림자"
+    },
+    "next-step": {
+      "label": "다음 걸음"
+    }
+  },
+  "cards": {
+    "the-fool": {
+      "name": "바보",
+      "tone": "열림",
+      "upright": "새로운 시작, 신뢰, 모든 답을 갖기 전에 움직여보려는 태도",
+      "reflection": "먼저 확신을 요구하지 않는다면 무엇이 더 가벼워질까요?",
+      "promptAngle": "새로운 에너지와 솔직한 호기심"
+    },
+    "the-magician": {
+      "name": "마법사",
+      "tone": "집중",
+      "upright": "주도성, 이미 가진 도구, 의도를 행동으로 옮기는 힘",
+      "reflection": "이미 손에 있지만 충분히 쓰지 않은 자원은 무엇인가요?",
+      "promptAngle": "선택, 기술, 드러나는 노력"
+    },
+    "the-high-priestess": {
+      "name": "여사제",
+      "tone": "고요",
+      "upright": "직감, 사적인 감각, 반응하기 전에 들어야 하는 필요",
+      "reflection": "설명하려 애쓰기 전에 이미 참으로 느껴지는 것은 무엇인가요?",
+      "promptAngle": "내면의 앎과 감정적 절제"
+    },
+    "the-empress": {
+      "name": "여황제",
+      "tone": "따뜻함",
+      "upright": "돌봄, 끌림, 성장, 숨 쉴 공간이 필요한 편안함",
+      "reflection": "어디에서 부드러움이 압박보다 더 큰 명확함을 만들까요?",
+      "promptAngle": "돌봄, 수용성, 꾸준한 성장"
+    },
+    "the-emperor": {
+      "name": "황제",
+      "tone": "단단함",
+      "upright": "구조, 경계, 성숙한 책임감",
+      "reflection": "어떤 경계가 상황을 더 신뢰하기 쉽게 만들까요?",
+      "promptAngle": "안정, 보호, 명확한 한계"
+    },
+    "the-lovers": {
+      "name": "연인",
+      "tone": "정렬",
+      "upright": "선택, 끌림, 가치, 솔직한 연결이 요구하는 대가",
+      "reflection": "어떤 선택이 행동을 가치와 맞추게 할까요?",
+      "promptAngle": "상호성, 가치, 결정적인 선택"
+    },
+    "the-chariot": {
+      "name": "전차",
+      "tone": "추진",
+      "upright": "흐름, 자기 조절, 긴장 속에서도 방향을 잡고 나아감",
+      "reflection": "어디에서 강도보다 방향이 더 필요할까요?",
+      "promptAngle": "앞으로 나아감과 절제된 감정"
+    },
+    "strength": {
+      "name": "힘",
+      "tone": "인내",
+      "upright": "부드러움, 용기, 압박 속에서도 유지되는 감정의 안정",
+      "reflection": "친절함을 잃지 않는 용기는 어떤 모습일까요?",
+      "promptAngle": "인내, 신뢰, 부드러운 힘"
+    },
+    "the-hermit": {
+      "name": "은둔자",
+      "tone": "성찰",
+      "upright": "거리 두기, 자기 탐구, 소음에서 멀어질 때 자라는 통찰",
+      "reflection": "확신을 연기하지 않을 때 더 선명해지는 답은 무엇인가요?",
+      "promptAngle": "거리, 지혜, 조용한 평가"
+    },
+    "wheel-of-fortune": {
+      "name": "운명의 수레바퀴",
+      "tone": "변화",
+      "upright": "주기, 타이밍, 유연함을 요구하는 변화",
+      "reflection": "어떤 패턴이 반복되고 있으며 이번에는 무엇을 달리할 수 있나요?",
+      "promptAngle": "타이밍, 변화, 반복되는 패턴"
+    },
+    "temperance": {
+      "name": "절제",
+      "tone": "균형",
+      "upright": "절도, 회복의 속도, 두 진실을 억지로 밀어붙이지 않고 섞는 일",
+      "reflection": "더 느린 리듬을 준다면 무엇이 쉬워질까요?",
+      "promptAngle": "균형, 회복, 신중한 소통"
+    },
+    "the-star": {
+      "name": "별",
+      "tone": "희망",
+      "upright": "새로워짐, 솔직함, 감정의 날씨가 지난 뒤 돌아오는 희망",
+      "reflection": "보호할 가치가 있는 작은 회복의 신호는 무엇인가요?",
+      "promptAngle": "희망, 개방성, 감정의 회복"
+    }
+  }
+}

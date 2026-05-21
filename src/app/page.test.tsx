@@ -8,7 +8,8 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import Home from "./page";
+import { TarotExperience } from "@/features/tarot-reading";
+import Home from "./(root)/page";
 
 const originalExecCommand = document.execCommand;
 const originalShare = navigator.share;
@@ -48,6 +49,22 @@ describe("Home", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders Korean localized content", () => {
+    render(<TarotExperience locale="ko" />);
+
+    expect(
+      screen.getByRole("heading", {
+        name: "세 장의 카드를 뽑고 AI용 타로 프롬프트로 정리하세요.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "카드 뽑기",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/의료, 법률, 재정/i)).toBeInTheDocument();
+  });
+
   it("draws cards and generates a copyable prompt", () => {
     vi.spyOn(Math, "random").mockReturnValue(0);
 
@@ -76,6 +93,49 @@ describe("Home", () => {
         name: "Copy prompt",
       }),
     ).toBeInTheDocument();
+  });
+
+  it("emits behavior analytics with stable ids", () => {
+    const events: {
+      readonly name: string;
+      readonly payload: Record<string, unknown>;
+    }[] = [];
+    const listener = (event: Event) => {
+      events.push((event as CustomEvent).detail);
+    };
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    window.addEventListener("tarot_spark_event", listener);
+
+    try {
+      render(<Home />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Reunion 3 cards" }));
+      fireEvent.click(screen.getByRole("button", { name: "Draw cards" }));
+
+      expect(events).toContainEqual({
+        name: "topic_click",
+        payload: { locale: "en", topic_id: "reunion" },
+      });
+      expect(events).toContainEqual({
+        name: "draw_start",
+        payload: { locale: "en", topic_id: "reunion" },
+      });
+      expect(events).toContainEqual({
+        name: "card_selected",
+        payload: {
+          locale: "en",
+          topic_id: "reunion",
+          position_id: "spark",
+          card_id: "the-fool",
+        },
+      });
+      expect(events).toContainEqual({
+        name: "result_view",
+        payload: { locale: "en", topic_id: "reunion", card_count: 3 },
+      });
+    } finally {
+      window.removeEventListener("tarot_spark_event", listener);
+    }
   });
 
   it("shows a failure message when prompt copy is blocked", async () => {

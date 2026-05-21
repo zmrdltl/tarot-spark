@@ -42,6 +42,31 @@
 - Move repeated tarot content, UI copy, or prompt text to one source of truth
   before it appears in multiple places.
 
+## Localization
+
+- Keep user-visible copy in locale data files unless the text is route metadata
+  or a framework-required static value.
+- Add or update every supported locale in the same change when changing
+  localized copy, tarot topics, spreads, cards, prompts, metadata, or
+  disclaimers.
+- Keep locale JSON files structurally identical across supported locales.
+- Keep locale JSON files matched to the supported schema; do not add unused or
+  extra keys even when every locale contains the same key.
+- Keep locale JSON files limited to localized message values; keep stable ids and
+  ordering in TypeScript.
+- Keep stable ids identical across supported locales for tarot topics, spread
+  positions, cards, analytics payload values, and route-facing data.
+- Load localized messages on the server when the route can determine the locale,
+  then pass only the current locale's serializable data to client components.
+- Mark production modules that import locale message JSON with
+  `import "server-only";`; localization tests are the exception.
+- Keep template placeholders matched to their formatter contract; missing,
+  unexpected, duplicate, or malformed placeholders must fail localization
+  integrity checks.
+- Do not add duplicate JSON object keys or blank localized strings.
+- Add or update tests when changing localization shape, stable ids, fallback
+  behavior, language switching, or localized public copy.
+
 ## Testing Expectations
 
 - Add or update tests for changed logic and important user flows.
@@ -61,6 +86,9 @@
   Playwright smoke in the same change or document the accepted exception.
 - Keep tests deterministic; do not depend on live ads, live analytics dashboards,
   or external AI calls.
+- `pnpm run test` must include localization integrity coverage for missing keys,
+  extra keys, duplicate JSON keys, blank strings, template placeholder mismatch,
+  and cross-locale stable id drift.
 
 ## Data And Secrets
 

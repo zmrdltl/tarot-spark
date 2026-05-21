@@ -23,12 +23,18 @@ src/
     layout.tsx
     page.tsx
     globals.css
+  i18n/
+    config.ts
+    template.ts
+  messages/
+    en/
+    ko/
   components/
     layout/
     ui/
   domain/
     tarot/
-      cards.ts
+      ids.ts
       spreads.ts
       prompts.ts
       topics.ts
@@ -38,6 +44,7 @@ src/
       components/
       hooks/
       TarotExperience.tsx
+      TarotExperienceClient.tsx
       analytics.ts
       index.ts
   lib/
@@ -80,8 +87,11 @@ src/app/analytics.ts -> src/features/tarot-reading/analytics.ts
   dialogs, tabs, cards, and tooltips.
 - `src/components/layout` owns app shell components such as navigation, footer,
   page frame, and persistent layout regions.
-- `src/domain/tarot` owns typed tarot data, tarot types, spread definitions,
-  prompt templates, and pure tarot helpers.
+- `src/domain/tarot` owns stable tarot ids, typed tarot data, tarot types,
+  spread definitions, prompt templates, and pure tarot helpers.
+- `src/i18n` owns locale configuration, template formatting, and localization
+  integrity tests.
+- `src/messages` owns locale JSON message files grouped by locale and namespace.
 - `src/lib` owns framework-agnostic helpers that are not tarot-specific.
 - `src/styles` owns shared styling helpers that do not belong in
   `globals.css`.
@@ -113,10 +123,21 @@ src/app/analytics.ts -> src/features/tarot-reading/analytics.ts
 - Place a new file in the narrowest owner that can change it safely.
 - Keep route composition in `src/app`; move reusable behavior out before a
   second route imports it.
+- Use a clearly named route group, such as `src/app/(root)`, when multiple root
+  layouts are needed to serve locale-specific document attributes while keeping
+  `/` as a route.
+- Do not use vague route group names such as `(default)`.
 - Keep workflow-specific state, event names, copy, and browser actions inside
   the owning feature.
-- Keep tarot domain data and pure tarot logic in `src/domain/tarot`, even when
-  the first consumer is a single feature.
+- Keep stable tarot ids and pure tarot logic in `src/domain/tarot`, even when the
+  first consumer is a single feature.
+- Keep locale message values in `src/messages`; do not repeat stable ids in
+  locale JSON when TypeScript can own the canonical id list.
+- Load locale messages from server components or server-only loaders, then pass
+  the current locale's serializable data into client components.
+- Add `import "server-only";` to production modules that import `src/messages`;
+  localization tests may import messages without that marker.
+- Do not import locale JSON files directly from client components.
 - Keep shared UI primitive props domain-free; pass tarot labels, descriptions,
   and event handlers from the feature.
 - Keep generic helpers in `src/lib` only when they have no tarot, feature, or
@@ -132,14 +153,18 @@ blocks:
 ```text
 src/app -> src/features -> src/components/ui
 src/app -> src/features -> src/domain/tarot
-src/features -> src/lib
-src/domain/tarot -> src/lib
+src/app -> src/i18n
+src/features -> src/i18n
+src/domain/tarot -> src/i18n
 ```
 
 - Shared UI components must not import from `src/app`, `src/features`, or
   `src/domain/tarot`.
 - Domain files must not import React components or route files.
 - Feature modules may import shared UI, domain data, and generic helpers.
+- Server components and server loaders may import `src/messages`; client
+  components should receive localized data through props.
+- Production modules that import `src/messages` must be server-only modules.
 - Cross-feature imports should go through the feature's `index.ts`.
 - Route files should import feature entry points instead of feature internals.
 
@@ -179,6 +204,8 @@ src/domain/tarot -> src/lib
 - Move state to a feature hook or feature module when multiple components in
   the same feature need it.
 - Keep tarot card, spread, topic, prompt, and interpretation data typed.
+- Keep tarot topic, spread position, and card ids in TypeScript as the canonical
+  source of truth; materialize localized arrays from those ids.
 - Keep browser storage, analytics, and clipboard helpers behind small wrapper
   functions in the feature or `src/lib`.
 - Do not add global state until at least two independent routes need the same
