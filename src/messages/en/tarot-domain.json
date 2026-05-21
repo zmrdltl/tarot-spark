@@ -1,0 +1,142 @@
+{
+  "promptTemplate": {
+    "spreadLine": "- {positionLabel}: {cardName} ({cardTone}) - {upright}. Reflection question: {reflection}",
+    "lines": [
+      "Act as a reflective tarot writing partner for entertainment and self-reflection.",
+      "Do not present the reading as medical, legal, financial, investment, or mental-health advice.",
+      "Topic: {topicLabel}",
+      "Reading goal: {promptLead}",
+      "Three-card spread:",
+      "{spread}",
+      "Write a concise reading with:",
+      "1. A plain-language theme.",
+      "2. One insight for each card position.",
+      "3. One grounded next-step reflection.",
+      "4. A brief reminder that the reading is for reflection, not professional advice."
+    ]
+  },
+  "topics": {
+    "love": {
+      "label": "Love",
+      "promptLead": "Explore the emotional pattern around love with grounded, reflective language.",
+      "resultFrame": "Look for what feels mutual, what needs patience, and what deserves clearer expression."
+    },
+    "reunion": {
+      "label": "Reunion",
+      "promptLead": "Reflect on whether reconnection is healthy, timely, and emotionally honest.",
+      "resultFrame": "Focus on what changed, what stayed unresolved, and what a careful next step could be."
+    },
+    "feelings": {
+      "label": "Feelings",
+      "promptLead": "Read the emotional signal without treating the cards as proof of another person's mind.",
+      "resultFrame": "Separate intuition from assumption, then name the feeling that needs attention."
+    },
+    "relationship-flow": {
+      "label": "Relationship flow",
+      "promptLead": "Map the current relationship flow as a self-reflection exercise.",
+      "resultFrame": "Notice where the connection is moving, where it is stuck, and what can be simplified."
+    },
+    "career-direction": {
+      "label": "Career direction",
+      "promptLead": "Use the spread to reflect on energy, focus, and next actions around work.",
+      "resultFrame": "Keep the reading practical and avoid treating it as financial or professional advice."
+    }
+  },
+  "spreadPositions": {
+    "spark": {
+      "label": "Spark"
+    },
+    "shadow": {
+      "label": "Shadow"
+    },
+    "next-step": {
+      "label": "Next step"
+    }
+  },
+  "cards": {
+    "the-fool": {
+      "name": "The Fool",
+      "tone": "Open",
+      "upright": "a fresh start, trust, and a willingness to move without every answer",
+      "reflection": "What would feel lighter if you stopped demanding certainty first?",
+      "promptAngle": "new energy and honest curiosity"
+    },
+    "the-magician": {
+      "name": "The Magician",
+      "tone": "Focused",
+      "upright": "agency, available tools, and turning intention into action",
+      "reflection": "Which resource is already in your hands but underused?",
+      "promptAngle": "choice, skill, and visible effort"
+    },
+    "the-high-priestess": {
+      "name": "The High Priestess",
+      "tone": "Quiet",
+      "upright": "intuition, privacy, and the need to listen before reacting",
+      "reflection": "What feels true before you try to explain it?",
+      "promptAngle": "inner knowing and emotional restraint"
+    },
+    "the-empress": {
+      "name": "The Empress",
+      "tone": "Warm",
+      "upright": "care, attraction, growth, and comfort that needs room to breathe",
+      "reflection": "Where can softness create more clarity than pressure?",
+      "promptAngle": "nurture, receptivity, and steady growth"
+    },
+    "the-emperor": {
+      "name": "The Emperor",
+      "tone": "Steady",
+      "upright": "structure, boundaries, and mature responsibility",
+      "reflection": "What boundary would make the situation easier to trust?",
+      "promptAngle": "stability, protection, and clear limits"
+    },
+    "the-lovers": {
+      "name": "The Lovers",
+      "tone": "Aligned",
+      "upright": "choice, attraction, values, and the cost of honest connection",
+      "reflection": "What choice would align your actions with your values?",
+      "promptAngle": "mutuality, values, and a defining choice"
+    },
+    "the-chariot": {
+      "name": "The Chariot",
+      "tone": "Driven",
+      "upright": "momentum, self-control, and moving through tension with direction",
+      "reflection": "Where do you need direction more than intensity?",
+      "promptAngle": "forward movement and disciplined emotion"
+    },
+    "strength": {
+      "name": "Strength",
+      "tone": "Patient",
+      "upright": "gentleness, courage, and emotional steadiness under pressure",
+      "reflection": "What would courage look like if it stayed kind?",
+      "promptAngle": "patience, trust, and soft power"
+    },
+    "the-hermit": {
+      "name": "The Hermit",
+      "tone": "Reflective",
+      "upright": "space, self-inquiry, and insight that grows away from noise",
+      "reflection": "What answer becomes clearer when you stop performing certainty?",
+      "promptAngle": "distance, wisdom, and quiet evaluation"
+    },
+    "wheel-of-fortune": {
+      "name": "Wheel of Fortune",
+      "tone": "Changing",
+      "upright": "cycles, timing, and a shift that asks for flexibility",
+      "reflection": "What pattern is repeating, and what can you do differently this time?",
+      "promptAngle": "timing, change, and repeated patterns"
+    },
+    "temperance": {
+      "name": "Temperance",
+      "tone": "Balanced",
+      "upright": "moderation, healing pace, and blending two truths without forcing either",
+      "reflection": "What would become easier if you gave it a slower rhythm?",
+      "promptAngle": "balance, repair, and measured communication"
+    },
+    "the-star": {
+      "name": "The Star",
+      "tone": "Hopeful",
+      "upright": "renewal, honesty, and hope that returns after emotional weather",
+      "reflection": "What small sign of renewal is worth protecting?",
+      "promptAngle": "hope, openness, and emotional renewal"
+    }
+  }
+}

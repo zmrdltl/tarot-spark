@@ -1,0 +1,444 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+import { spreadPositionIds, tarotCardIds, topicIds } from "@/domain/tarot";
+import enTarotMessages from "@/messages/en/tarot-domain.json";
+import enCopy from "@/messages/en/tarot-reading.json";
+import koTarotMessages from "@/messages/ko/tarot-domain.json";
+import koCopy from "@/messages/ko/tarot-reading.json";
+import {
+  defaultLocale,
+  prefixedLocales,
+  supportedLocales,
+  type Locale,
+} from "./config";
+import { getTarotData } from "./tarot-data";
+import { assertTemplatePlaceholders } from "./template";
+
+const uiCopyByLocale = {
+  en: enCopy,
+  ko: koCopy,
+} satisfies Record<Locale, unknown>;
+
+const tarotMessagesByLocale = {
+  en: enTarotMessages,
+  ko: koTarotMessages,
+} satisfies Record<Locale, unknown>;
+
+const jsonFiles = [
+  {
+    label: "messages/en/tarot-reading.json",
+    path: "src/messages/en/tarot-reading.json",
+  },
+  {
+    label: "messages/ko/tarot-reading.json",
+    path: "src/messages/ko/tarot-reading.json",
+  },
+  {
+    label: "messages/en/tarot-domain.json",
+    path: "src/messages/en/tarot-domain.json",
+  },
+  {
+    label: "messages/ko/tarot-domain.json",
+    path: "src/messages/ko/tarot-domain.json",
+  },
+] as const;
+
+type JsonSchema =
+  | "string"
+  | readonly [JsonSchema]
+  | {
+      readonly [key: string]: JsonSchema;
+    };
+type JsonObjectSchema = {
+  readonly [key: string]: JsonSchema;
+};
+
+const uiCopySchema = {
+  metadata: {
+    title: "string",
+    description: "string",
+  },
+  brand: "string",
+  heading: "string",
+  intro: "string",
+  topicSelectorLabel: "string",
+  cardCountLabel: "string",
+  drawButton: "string",
+  workspaceLabel: "string",
+  cardMarkLabel: "string",
+  generatedPromptLabel: "string",
+  copyPrompt: "string",
+  copied: "string",
+  share: "string",
+  shared: "string",
+  copiedShareText: "string",
+  blockedAction: "string",
+  emptyHeading: "string",
+  emptyBody: "string",
+  disclaimer: "string",
+  languageSwitchLabel: "string",
+  shareTitle: "string",
+  shareText: "string",
+  placeholders: [
+    {
+      positionLabel: "string",
+      cardName: "string",
+      cardTone: "string",
+    },
+  ],
+} as const satisfies JsonSchema;
+
+const tarotMessagesSchema = {
+  promptTemplate: {
+    spreadLine: "string",
+    lines: ["string"],
+  },
+  topics: exactRecordSchema(topicIds, {
+    label: "string",
+    promptLead: "string",
+    resultFrame: "string",
+  }),
+  spreadPositions: exactRecordSchema(spreadPositionIds, {
+    label: "string",
+  }),
+  cards: exactRecordSchema(tarotCardIds, {
+    name: "string",
+    tone: "string",
+    upright: "string",
+    reflection: "string",
+    promptAngle: "string",
+  }),
+} satisfies JsonSchema;
+
+describe("i18n integrity", () => {
+  it("keeps locale files aligned with supported locales", () => {
+    expect(Object.keys(uiCopyByLocale).sort()).toEqual(
+      [...supportedLocales].sort(),
+    );
+    expect(Object.keys(tarotMessagesByLocale).sort()).toEqual(
+      [...supportedLocales].sort(),
+    );
+  });
+
+  it("keeps prefixed locale paths canonical", () => {
+    expect(prefixedLocales).not.toContain(defaultLocale);
+    expect([...prefixedLocales, defaultLocale].sort()).toEqual(
+      [...supportedLocales].sort(),
+    );
+  });
+
+  it("keeps UI copy keys identical across locales", () => {
+    expect(collectShapePaths(koCopy)).toEqual(collectShapePaths(enCopy));
+  });
+
+  it("keeps tarot message keys identical across locales", () => {
+    expect(collectShapePaths(koTarotMessages)).toEqual(
+      collectShapePaths(enTarotMessages),
+    );
+  });
+
+  it("matches supported locale JSON schemas exactly", () => {
+    const schemaErrors = [
+      ...collectLocaleSchemaErrors(uiCopyByLocale, uiCopySchema, "$.uiCopy"),
+      ...collectLocaleSchemaErrors(
+        tarotMessagesByLocale,
+        tarotMessagesSchema,
+        "$.tarotMessages",
+      ),
+    ];
+
+    expect(schemaErrors).toEqual([]);
+  });
+
+  it("materializes tarot data in canonical id order", () => {
+    for (const locale of supportedLocales) {
+      const data = getTarotData(locale);
+
+      expect(
+        data.topics.map((topic) => topic.id),
+        `topic order for ${locale}`,
+      ).toEqual(topicIds);
+      expect(
+        data.spreadPositions.map((position) => position.id),
+        `spread position order for ${locale}`,
+      ).toEqual(spreadPositionIds);
+      expect(
+        data.cards.map((card) => card.id),
+        `card order for ${locale}`,
+      ).toEqual(tarotCardIds);
+    }
+  });
+
+  it("keeps template placeholders exact", () => {
+    const templateErrors = supportedLocales.flatMap((locale) => {
+      const copy = uiCopyByLocale[locale];
+      const tarotMessages = tarotMessagesByLocale[locale];
+
+      return [
+        ...collectTemplatePlaceholderErrors(
+          `${locale} tarot-reading.cardCountLabel`,
+          copy.cardCountLabel,
+          ["count"],
+        ),
+        ...collectTemplatePlaceholderErrors(
+          `${locale} tarot-reading.shareText`,
+          copy.shareText,
+          ["cardNames", "topicLabel"],
+        ),
+        ...collectTemplatePlaceholderErrors(
+          `${locale} tarot promptTemplate.spreadLine`,
+          tarotMessages.promptTemplate.spreadLine,
+          ["cardName", "cardTone", "positionLabel", "reflection", "upright"],
+        ),
+        ...collectTemplatePlaceholderErrors(
+          `${locale} tarot promptTemplate.lines`,
+          tarotMessages.promptTemplate.lines.join("\n"),
+          ["promptLead", "spread", "topicLabel"],
+        ),
+      ];
+    });
+
+    expect(templateErrors).toEqual([]);
+  });
+
+  it("does not duplicate JSON object keys", () => {
+    const duplicateKeys = jsonFiles.flatMap(({ label, path: jsonPath }) => {
+      const text = readFileSync(path.join(process.cwd(), jsonPath), "utf8");
+      return findDuplicateJsonKeys(text).map((duplicate) => ({
+        ...duplicate,
+        file: label,
+      }));
+    });
+
+    expect(duplicateKeys).toEqual([]);
+  });
+
+  it("does not leave localized strings blank", () => {
+    const blankStrings = [
+      ...collectBlankStringPaths(uiCopyByLocale, "$.uiCopyByLocale"),
+      ...collectBlankStringPaths(tarotMessagesByLocale, "$.tarotMessages"),
+    ];
+
+    expect(blankStrings).toEqual([]);
+  });
+});
+
+function exactRecordSchema(
+  keys: readonly string[],
+  itemSchema: JsonObjectSchema,
+): JsonObjectSchema {
+  return Object.fromEntries(keys.map((key) => [key, itemSchema]));
+}
+
+function collectLocaleSchemaErrors<T extends Record<Locale, unknown>>(
+  localizedValues: T,
+  schema: JsonSchema,
+  path: string,
+) {
+  return supportedLocales.flatMap((locale) =>
+    collectSchemaErrors(localizedValues[locale], schema, `${path}.${locale}`),
+  );
+}
+
+function collectSchemaErrors(
+  value: unknown,
+  schema: JsonSchema,
+  path: string,
+): string[] {
+  if (schema === "string") {
+    return typeof value === "string" ? [] : [`${path} expected string`];
+  }
+
+  if (Array.isArray(schema)) {
+    if (!Array.isArray(value)) {
+      return [`${path} expected array`];
+    }
+
+    const itemSchema = schema[0];
+
+    if (itemSchema === undefined) {
+      return value.length === 0 ? [] : [`${path} expected empty array`];
+    }
+
+    return value.flatMap((item, index) =>
+      collectSchemaErrors(item, itemSchema, `${path}[${index}]`),
+    );
+  }
+
+  if (!isRecord(value)) {
+    return [`${path} expected object`];
+  }
+
+  const objectSchema = schema as JsonObjectSchema;
+  const expectedKeys = Object.keys(objectSchema).sort();
+  const actualKeys = Object.keys(value).sort();
+  const missingKeys = expectedKeys.filter((key) => !actualKeys.includes(key));
+  const unexpectedKeys = actualKeys.filter(
+    (key) => !expectedKeys.includes(key),
+  );
+  const keyErrors = [
+    formatSchemaKeyError(path, "missing", missingKeys),
+    formatSchemaKeyError(path, "unexpected", unexpectedKeys),
+  ].filter((message): message is string => message !== undefined);
+
+  return [
+    ...keyErrors,
+    ...expectedKeys.flatMap((key) => {
+      const childSchema = objectSchema[key];
+
+      if (childSchema === undefined || !(key in value)) {
+        return [];
+      }
+
+      return collectSchemaErrors(value[key], childSchema, `${path}.${key}`);
+    }),
+  ];
+}
+
+function formatSchemaKeyError(
+  path: string,
+  label: string,
+  keys: readonly string[],
+) {
+  return keys.length > 0
+    ? `${path} ${label} keys: ${keys.join(", ")}`
+    : undefined;
+}
+
+function collectTemplatePlaceholderErrors(
+  context: string,
+  template: string,
+  expectedKeys: readonly string[],
+) {
+  try {
+    assertTemplatePlaceholders(template, expectedKeys, context);
+    return [];
+  } catch (error) {
+    return [error instanceof Error ? error.message : String(error)];
+  }
+}
+
+function collectShapePaths(value: unknown, path = "$"): string[] {
+  if (Array.isArray(value)) {
+    return [
+      path,
+      ...value.flatMap((item, index) =>
+        collectShapePaths(item, `${path}[${index}]`),
+      ),
+    ];
+  }
+
+  if (isRecord(value)) {
+    return [
+      path,
+      ...Object.keys(value)
+        .sort()
+        .flatMap((key) => collectShapePaths(value[key], `${path}.${key}`)),
+    ];
+  }
+
+  return [path];
+}
+
+function collectBlankStringPaths(value: unknown, path = "$"): string[] {
+  if (typeof value === "string") {
+    return value.trim().length === 0 ? [path] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) =>
+      collectBlankStringPaths(item, `${path}[${index}]`),
+    );
+  }
+
+  if (isRecord(value)) {
+    return Object.keys(value).flatMap((key) =>
+      collectBlankStringPaths(value[key], `${path}.${key}`),
+    );
+  }
+
+  return [];
+}
+
+function findDuplicateJsonKeys(text: string) {
+  const duplicates: { readonly key: string; readonly offset: number }[] = [];
+  const stack: { readonly keys: Set<string> }[] = [];
+  let index = 0;
+
+  while (index < text.length) {
+    const character = text[index];
+
+    if (character === "{") {
+      stack.push({ keys: new Set<string>() });
+      index += 1;
+      continue;
+    }
+
+    if (character === "}") {
+      stack.pop();
+      index += 1;
+      continue;
+    }
+
+    if (character !== '"') {
+      index += 1;
+      continue;
+    }
+
+    const parsedString = parseJsonString(text, index);
+    const nextTokenIndex = findNextNonWhitespaceIndex(text, parsedString.end);
+
+    if (stack.length > 0 && text[nextTokenIndex] === ":") {
+      const currentObject = stack[stack.length - 1];
+
+      if (currentObject?.keys.has(parsedString.value)) {
+        duplicates.push({ key: parsedString.value, offset: index });
+      }
+
+      currentObject?.keys.add(parsedString.value);
+    }
+
+    index = parsedString.end;
+  }
+
+  return duplicates;
+}
+
+function parseJsonString(text: string, start: number) {
+  let index = start + 1;
+  let value = "";
+
+  while (index < text.length) {
+    const character = text[index];
+
+    if (character === "\\") {
+      value += text[index + 1] ?? "";
+      index += 2;
+      continue;
+    }
+
+    if (character === '"') {
+      return { value, end: index + 1 };
+    }
+
+    value += character;
+    index += 1;
+  }
+
+  throw new Error(`Unterminated JSON string at offset ${start}.`);
+}
+
+function findNextNonWhitespaceIndex(text: string, start: number) {
+  let index = start;
+
+  while (/\s/.test(text[index] ?? "")) {
+    index += 1;
+  }
+
+  return index;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}

@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "title": "tarot-spark",
+    "description": "Draw tarot cards and create an AI-ready reflection prompt."
+  },
+  "brand": "tarot-spark",
+  "heading": "Draw three cards and turn them into an AI-ready tarot prompt.",
+  "intro": "Pick a topic, draw a compact spread, then copy a prompt designed for reflective tarot writing.",
+  "topicSelectorLabel": "Choose a tarot topic",
+  "cardCountLabel": "{count} cards",
+  "drawButton": "Draw cards",
+  "workspaceLabel": "Tarot reading workspace",
+  "cardMarkLabel": "Decorative tarot card mark",
+  "generatedPromptLabel": "Generated prompt",
+  "copyPrompt": "Copy prompt",
+  "copied": "Copied",
+  "share": "Share",
+  "shared": "Shared",
+  "copiedShareText": "Copied share text",
+  "blockedAction": "Browser permission blocked that action. You can still select and copy the prompt manually.",
+  "emptyHeading": "Choose a topic to begin.",
+  "emptyBody": "The first draw creates a three-card spread and a prompt you can use with an AI writing tool.",
+  "disclaimer": "Tarot content is for entertainment and self-reflection only. It is not medical, legal, financial, investment, or mental-health advice.",
+  "languageSwitchLabel": "Choose language",
+  "shareTitle": "tarot-spark reading",
+  "shareText": "{topicLabel} tarot prompt: {cardNames}",
+  "placeholders": [
+    {
+      "positionLabel": "Spark",
+      "cardName": "Ready",
+      "cardTone": "Pick a topic"
+    },
+    {
+      "positionLabel": "Shadow",
+      "cardName": "Set",
+      "cardTone": "Draw cards"
+    },
+    {
+      "positionLabel": "Next step",
+      "cardName": "Prompt",
+      "cardTone": "Copy result"
+    }
+  ]
+}
