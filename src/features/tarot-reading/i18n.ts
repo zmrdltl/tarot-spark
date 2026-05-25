@@ -2,6 +2,7 @@ import "server-only";
 
 import type { Metadata } from "next";
 import type { Locale } from "@/i18n/config";
+import { withLocalizedAlternates } from "@/i18n/seo";
 import enCopy from "@/messages/en/tarot-reading.json";
 import koCopy from "@/messages/ko/tarot-reading.json";
 
@@ -72,5 +73,5 @@ export function getTarotReadingCopy(locale: Locale): TarotReadingCopy {
 }
 
 export function getTarotReadingMetadata(locale: Locale): Metadata {
-  return copyJsonByLocale[locale].metadata;
+  return withLocalizedAlternates(copyJsonByLocale[locale].metadata, locale);
 }

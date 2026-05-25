@@ -32,6 +32,54 @@ test("serves Korean html lang before hydration", async ({ request }) => {
   expect(html).toContain('<html lang="ko">');
 });
 
+test("serves localized SEO metadata and discovery files", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/ko");
+
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveCount(1);
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="ko"]'),
+  ).toHaveCount(1);
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="x-default"]'),
+  ).toHaveCount(1);
+  expectPathname(
+    await page.locator('link[rel="canonical"]').getAttribute("href"),
+    "/ko",
+  );
+  expectPathname(
+    await page
+      .locator('link[rel="alternate"][hreflang="en"]')
+      .getAttribute("href"),
+    "/",
+  );
+  expectPathname(
+    await page
+      .locator('link[rel="alternate"][hreflang="ko"]')
+      .getAttribute("href"),
+    "/ko",
+  );
+
+  const robotsResponse = await request.get("/robots.txt");
+  const robotsText = await robotsResponse.text();
+  expect(robotsResponse.ok()).toBe(true);
+  expect(robotsText).toContain("Allow: /");
+  expect(robotsText).toContain("/sitemap.xml");
+
+  const sitemapResponse = await request.get("/sitemap.xml");
+  const sitemapXml = await sitemapResponse.text();
+  expect(sitemapResponse.ok()).toBe(true);
+  expect(sitemapXml).toContain("<loc>");
+  expect(sitemapXml).toContain("/ko");
+  expect(sitemapXml).toContain('hreflang="en"');
+  expect(sitemapXml).toContain('hreflang="ko"');
+  expect(sitemapXml).toContain('hreflang="x-default"');
+});
+
 test("returns 404 for unsupported or duplicate locale paths", async ({
   request,
 }) => {
@@ -82,3 +130,8 @@ test("draws tarot cards and copies the generated prompt", async ({ page }) => {
     page.getByRole("button", { name: "Copied share text" }),
   ).toBeVisible();
 });
+
+function expectPathname(href: string | null, pathname: string) {
+  expect(href).not.toBeNull();
+  expect(new URL(href ?? "http://localhost").pathname).toBe(pathname);
+}
