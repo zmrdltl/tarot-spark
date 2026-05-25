@@ -24,9 +24,22 @@ Set `NEXT_PUBLIC_SITE_URL` to the production origin before deployment. It is use
 for canonical URLs, alternate language links, `robots.txt`, and `sitemap.xml`.
 Local builds fall back to `http://localhost:3000`.
 
+Set `NEXT_PUBLIC_SHARE_SITE_URL` only when share links should use a different
+origin from `NEXT_PUBLIC_SITE_URL`. The value must be reachable outside the
+local machine, so do not use `localhost` for KakaoTalk sharing. In production,
+leave it unset so share links use the production origin.
+
 Set `NEXT_PUBLIC_GA_ID` to the Google Analytics measurement ID, such as
 `G-XXXXXXXXXX`, to enable page view tracking and tarot behavior events. Leave it
 unset for local development or preview deployments that should not send GA data.
+
+Set `NEXT_PUBLIC_KAKAO_JS_KEY` to enable KakaoTalk sharing. Kakao domains:
+`App > JavaScript SDK domain` must include the app origin, and
+`App > Product Link > Web domain` must include the shared URL origin
+(`NEXT_PUBLIC_SHARE_SITE_URL`, otherwise `NEXT_PUBLIC_SITE_URL`).
+Set `NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS` to the comma-separated origins
+registered in Kakao. It must include both the running origin and the shared URL
+origin, otherwise the KakaoTalk button stays hidden.
 
 Use `.env.local` for local values. The committed `.env.example` file documents
 the expected keys.

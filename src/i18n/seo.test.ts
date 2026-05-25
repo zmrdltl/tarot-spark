@@ -2,11 +2,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   getAbsoluteAlternateLanguageUrls,
   getAbsoluteLocaleUrl,
+  getShareSiteUrl,
   getSiteUrl,
   withLocalizedAlternates,
 } from "./seo";
 
 const originalSiteUrl = process.env["NEXT_PUBLIC_SITE_URL"];
+const originalShareSiteUrl = process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
 const originalVercelProjectProductionUrl =
   process.env["VERCEL_PROJECT_PRODUCTION_URL"];
 const originalVercelUrl = process.env["VERCEL_URL"];
@@ -14,6 +16,7 @@ const originalVercelUrl = process.env["VERCEL_URL"];
 describe("i18n SEO", () => {
   afterEach(() => {
     restoreEnv("NEXT_PUBLIC_SITE_URL", originalSiteUrl);
+    restoreEnv("NEXT_PUBLIC_SHARE_SITE_URL", originalShareSiteUrl);
     restoreEnv(
       "VERCEL_PROJECT_PRODUCTION_URL",
       originalVercelProjectProductionUrl,
@@ -33,6 +36,7 @@ describe("i18n SEO", () => {
   it("normalizes configured site origins for locale urls", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] =
       "https://example.com///?draft=true#top";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
     delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
@@ -41,8 +45,39 @@ describe("i18n SEO", () => {
     expect(getAbsoluteLocaleUrl("ko")).toBe("https://example.com/ko");
   });
 
+  it("uses the share origin override without changing canonical urls", () => {
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    process.env["NEXT_PUBLIC_SHARE_SITE_URL"] =
+      "http://localhost:3000///?draft=true#top";
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
+    delete process.env["VERCEL_URL"];
+
+    expect(getSiteUrl().toString()).toBe("https://example.com/");
+    expect(getShareSiteUrl().toString()).toBe("http://localhost:3000/");
+    expect(getAbsoluteLocaleUrl("ko")).toBe("https://example.com/ko");
+  });
+
+  it("falls back to the canonical origin when the share origin is unset", () => {
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
+    delete process.env["VERCEL_URL"];
+
+    expect(getShareSiteUrl().toString()).toBe("https://example.com/");
+  });
+
+  it("falls back to the canonical origin when the share origin is invalid", () => {
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    process.env["NEXT_PUBLIC_SHARE_SITE_URL"] = "not-a-url";
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
+    delete process.env["VERCEL_URL"];
+
+    expect(getShareSiteUrl().toString()).toBe("https://example.com/");
+  });
+
   it("prefers Vercel's production origin over the deployment origin", () => {
     delete process.env["NEXT_PUBLIC_SITE_URL"];
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
     process.env["VERCEL_PROJECT_PRODUCTION_URL"] = "tarot-spark.vercel.app";
     process.env["VERCEL_URL"] = "tarot-spark-e7dnbeeaa-tarotspark.vercel.app";
 
@@ -53,6 +88,7 @@ describe("i18n SEO", () => {
 
   it("uses Vercel's deployment origin when no production origin is available", () => {
     delete process.env["NEXT_PUBLIC_SITE_URL"];
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
     delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     process.env["VERCEL_URL"] = "tarot-spark.vercel.app";
 
@@ -63,6 +99,7 @@ describe("i18n SEO", () => {
 
   it("builds absolute alternate language urls", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
     delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
@@ -75,6 +112,7 @@ describe("i18n SEO", () => {
 
   it("adds canonical and hreflang metadata to localized pages", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
     delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 

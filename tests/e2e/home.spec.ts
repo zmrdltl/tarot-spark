@@ -169,6 +169,18 @@ test("draws tarot cards and copies the generated prompt", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Copied share text" }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "Instagram" }).click();
+
+  await expect(
+    page.getByRole("button", { name: "Instagram URL copied" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Copy URL" }).click();
+
+  await expect(
+    page.getByRole("button", { exact: true, name: "URL copied" }),
+  ).toBeVisible();
 });
 
 function expectPathname(href: string | null, pathname: string) {
