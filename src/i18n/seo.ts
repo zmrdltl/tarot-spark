@@ -19,6 +19,15 @@ export function getSiteUrl(): URL {
   );
 }
 
+export function getShareSiteUrl(): URL {
+  const siteUrl = getSiteUrl();
+
+  return normalizeSiteUrl(
+    process.env["NEXT_PUBLIC_SHARE_SITE_URL"] ?? siteUrl.toString(),
+    siteUrl.toString(),
+  );
+}
+
 export function getAbsoluteSiteUrl(pathname: string) {
   return new URL(pathname, getSiteUrl()).toString();
 }
@@ -55,7 +64,7 @@ function getVercelSiteOrigin(vercelUrl: string | undefined) {
   return vercelUrl ? `https://${vercelUrl}` : undefined;
 }
 
-function normalizeSiteUrl(value: string) {
+function normalizeSiteUrl(value: string, fallback = fallbackSiteOrigin) {
   try {
     const url = new URL(value);
     url.pathname = normalizePathname(url.pathname);
@@ -63,7 +72,7 @@ function normalizeSiteUrl(value: string) {
     url.hash = "";
     return url;
   } catch {
-    return new URL(fallbackSiteOrigin);
+    return new URL(fallback);
   }
 }
 

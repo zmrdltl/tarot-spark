@@ -12,17 +12,48 @@ import { TarotExperience } from "@/features/tarot-reading";
 import Home from "./(root)/page";
 
 const originalExecCommand = document.execCommand;
+const originalClipboard = navigator.clipboard;
+const originalKakao = window.Kakao;
+const originalKakaoAllowedOrigins =
+  process.env["NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS"];
+const originalKakaoJavaScriptKey = process.env["NEXT_PUBLIC_KAKAO_JS_KEY"];
+const originalSiteUrl = process.env["NEXT_PUBLIC_SITE_URL"];
+const originalShareSiteUrl = process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+const originalUrl = window.location.href;
 const originalShare = navigator.share;
+const kakaoSdkScriptId = "kakao-javascript-sdk";
+const kakaoSdkScriptUrl =
+  "https://t1.kakaocdn.net/kakao_js_sdk/2.8.1/kakao.min.js";
+const kakaoSdkIntegrity =
+  "sha384-OL+ylM/iuPLtW5U3XcvLSGhE8JzReKDank5InqlHGWPhb4140/yrBw0bg0y7+C9J";
 
 describe("Home", () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    restoreEnv(
+      "NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS",
+      originalKakaoAllowedOrigins,
+    );
+    restoreEnv("NEXT_PUBLIC_KAKAO_JS_KEY", originalKakaoJavaScriptKey);
+    restoreEnv("NEXT_PUBLIC_SITE_URL", originalSiteUrl);
+    restoreEnv("NEXT_PUBLIC_SHARE_SITE_URL", originalShareSiteUrl);
+    document.getElementById(kakaoSdkScriptId)?.remove();
+    window.history.replaceState(null, "", originalUrl);
 
     if (originalExecCommand) {
       document.execCommand = originalExecCommand;
     } else {
       Reflect.deleteProperty(document, "execCommand");
+    }
+
+    if (originalClipboard) {
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: originalClipboard,
+      });
+    } else {
+      Reflect.deleteProperty(navigator, "clipboard");
     }
 
     if (originalShare) {
@@ -32,6 +63,12 @@ describe("Home", () => {
       });
     } else {
       Reflect.deleteProperty(navigator, "share");
+    }
+
+    if (originalKakao) {
+      window.Kakao = originalKakao;
+    } else {
+      Reflect.deleteProperty(window, "Kakao");
     }
   });
 
@@ -101,6 +138,53 @@ describe("Home", () => {
         name: "Copy prompt",
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Share",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: "KakaoTalk",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Instagram",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Copy URL",
+      }),
+    ).toBeInTheDocument();
+    expect(window.location.search).toContain("topic=love");
+    expect(window.location.search).toContain(
+      "cards=the-fool%2Cthe-magician%2Cthe-high-priestess",
+    );
+  });
+
+  it("restores a shared reading from URL parameters", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      "/?topic=reunion&cards=the-fool,the-magician,the-high-priestess",
+    );
+
+    render(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Spark: The Fool")).toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole("button", { name: "Reunion 3 cards" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    const prompt = screen.getByLabelText(
+      "Generated prompt",
+    ) as HTMLTextAreaElement;
+    expect(prompt.value).toContain("Topic: Reunion");
+    expect(prompt.value).toContain("The High Priestess");
   });
 
   it("emits behavior analytics with stable ids", () => {
@@ -204,6 +288,212 @@ describe("Home", () => {
     });
     expect(document.execCommand).toHaveBeenCalledWith("copy");
   });
+
+  it("shares to KakaoTalk when a JavaScript key is configured", async () => {
+    const init = vi.fn();
+    const sendDefault = vi.fn();
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    process.env["NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS"] =
+      "http://localhost:3000,https://tarot-spark.example";
+    process.env["NEXT_PUBLIC_KAKAO_JS_KEY"] = "test-kakao-js-key";
+    window.Kakao = {
+      Share: {
+        sendDefault,
+      },
+      init,
+      isInitialized: vi.fn(() => false),
+    };
+
+    renderDrawnReading();
+    const shareUrl = getExpectedShareUrl();
+
+    fireEvent.click(await screen.findByRole("button", { name: "KakaoTalk" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "KakaoTalk opened" }),
+      ).toBeInTheDocument();
+    });
+    expect(init).toHaveBeenCalledWith("test-kakao-js-key");
+    expect(sendDefault).toHaveBeenCalledWith({
+      objectType: "text",
+      text: "Love tarot prompt: The Fool, The Magician, The High Priestess",
+      link: {
+        mobileWebUrl: shareUrl,
+        webUrl: shareUrl,
+      },
+    });
+  });
+
+  it("does not offer KakaoTalk without allowed Kakao origins", () => {
+    const init = vi.fn();
+    const sendDefault = vi.fn();
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    delete process.env["NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS"];
+    process.env["NEXT_PUBLIC_KAKAO_JS_KEY"] = "test-kakao-js-key";
+    window.Kakao = {
+      Share: {
+        sendDefault,
+      },
+      init,
+      isInitialized: vi.fn(() => false),
+    };
+
+    renderDrawnReading();
+
+    expect(
+      screen.queryByRole("button", { name: "KakaoTalk" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Copy URL" }),
+    ).toBeInTheDocument();
+    expect(init).not.toHaveBeenCalled();
+    expect(sendDefault).not.toHaveBeenCalled();
+    expect(document.getElementById(kakaoSdkScriptId)).toBeNull();
+  });
+
+  it("does not offer KakaoTalk when the current origin is not allowed", () => {
+    const init = vi.fn();
+    const sendDefault = vi.fn();
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    process.env["NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS"] =
+      "https://tarot-spark.example";
+    process.env["NEXT_PUBLIC_KAKAO_JS_KEY"] = "test-kakao-js-key";
+    window.Kakao = {
+      Share: {
+        sendDefault,
+      },
+      init,
+      isInitialized: vi.fn(() => false),
+    };
+
+    renderDrawnReading();
+
+    expect(
+      screen.queryByRole("button", { name: "KakaoTalk" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Copy URL" }),
+    ).toBeInTheDocument();
+    expect(init).not.toHaveBeenCalled();
+    expect(sendDefault).not.toHaveBeenCalled();
+    expect(document.getElementById(kakaoSdkScriptId)).toBeNull();
+  });
+
+  it("copies the shareable reading URL", async () => {
+    const writeText = vi.fn((text: string) => {
+      void text;
+      return Promise.resolve();
+    });
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+
+    renderDrawnReading();
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy URL" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "URL copied" }),
+      ).toBeInTheDocument();
+    });
+    const copiedUrl = writeText.mock.calls[0]?.[0];
+    expect(copiedUrl).toBeDefined();
+
+    const url = new URL(String(copiedUrl));
+    expect(url.searchParams.get("topic")).toBe("love");
+    expect(url.searchParams.get("cards")).toBe(
+      "the-fool,the-magician,the-high-priestess",
+    );
+    expect(url.origin).toBe("https://tarot-spark.example");
+  });
+
+  it("copies the Instagram share URL", async () => {
+    const writeText = vi.fn((text: string) => {
+      void text;
+      return Promise.resolve();
+    });
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+
+    renderDrawnReading();
+
+    fireEvent.click(screen.getByRole("button", { name: "Instagram" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Instagram URL copied" }),
+      ).toBeInTheDocument();
+    });
+    expect(writeText).toHaveBeenCalledWith(getExpectedShareUrl());
+  });
+
+  it("loads the Kakao SDK script and allows retry after load failure", async () => {
+    process.env["NEXT_PUBLIC_SITE_URL"] = "https://tarot-spark.example";
+    delete process.env["NEXT_PUBLIC_SHARE_SITE_URL"];
+    process.env["NEXT_PUBLIC_KAKAO_ALLOWED_ORIGINS"] =
+      "http://localhost:3000,https://tarot-spark.example";
+    process.env["NEXT_PUBLIC_KAKAO_JS_KEY"] = "test-kakao-js-key";
+
+    renderDrawnReading();
+
+    fireEvent.click(await screen.findByRole("button", { name: "KakaoTalk" }));
+
+    const firstScript = document.getElementById(
+      kakaoSdkScriptId,
+    ) as HTMLScriptElement | null;
+    expect(firstScript).not.toBeNull();
+    expect(firstScript?.crossOrigin).toBe("anonymous");
+    expect(firstScript?.integrity).toBe(kakaoSdkIntegrity);
+    expect(firstScript?.src).toBe(kakaoSdkScriptUrl);
+
+    fireEvent.error(firstScript as HTMLScriptElement);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/browser permission blocked that action/i),
+      ).toBeInTheDocument();
+    });
+    expect(document.getElementById(kakaoSdkScriptId)).toBeNull();
+
+    const init = vi.fn();
+    const sendDefault = vi.fn();
+    fireEvent.click(screen.getByRole("button", { name: "KakaoTalk" }));
+
+    const secondScript = document.getElementById(
+      kakaoSdkScriptId,
+    ) as HTMLScriptElement | null;
+    expect(secondScript).not.toBeNull();
+    expect(secondScript).not.toBe(firstScript);
+
+    window.Kakao = {
+      Share: {
+        sendDefault,
+      },
+      init,
+      isInitialized: vi.fn(() => false),
+    };
+    fireEvent.load(secondScript as HTMLScriptElement);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "KakaoTalk opened" }),
+      ).toBeInTheDocument();
+    });
+    expect(init).toHaveBeenCalledWith("test-kakao-js-key");
+    expect(sendDefault).toHaveBeenCalledTimes(1);
+  });
 });
 
 function renderDrawnReading() {
@@ -211,4 +501,17 @@ function renderDrawnReading() {
 
   render(<Home />);
   fireEvent.click(screen.getByRole("button", { name: "Draw cards" }));
+}
+
+function restoreEnv(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key];
+    return;
+  }
+
+  process.env[key] = value;
+}
+
+function getExpectedShareUrl(origin = "https://tarot-spark.example") {
+  return `${origin}/?topic=love&cards=the-fool%2Cthe-magician%2Cthe-high-priestess`;
 }

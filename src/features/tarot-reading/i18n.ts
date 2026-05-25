@@ -19,6 +19,12 @@ export type TarotReadingMessages = {
   readonly generatedPromptLabel: string;
   readonly copyPrompt: string;
   readonly copied: string;
+  readonly copyUrl: string;
+  readonly copiedUrl: string;
+  readonly instagramShare: string;
+  readonly instagramCopied: string;
+  readonly kakaoShare: string;
+  readonly kakaoShared: string;
   readonly share: string;
   readonly shared: string;
   readonly copiedShareText: string;
@@ -52,6 +58,8 @@ export function getTarotReadingCopy(locale: Locale): TarotReadingCopy {
     cardCountLabel: copy.cardCountLabel,
     cardMarkLabel: copy.cardMarkLabel,
     copied: copy.copied,
+    copiedUrl: copy.copiedUrl,
+    copyUrl: copy.copyUrl,
     copiedShareText: copy.copiedShareText,
     copyPrompt: copy.copyPrompt,
     disclaimer: copy.disclaimer,
@@ -60,7 +68,11 @@ export function getTarotReadingCopy(locale: Locale): TarotReadingCopy {
     emptyHeading: copy.emptyHeading,
     generatedPromptLabel: copy.generatedPromptLabel,
     heading: copy.heading,
+    instagramCopied: copy.instagramCopied,
+    instagramShare: copy.instagramShare,
     intro: copy.intro,
+    kakaoShare: copy.kakaoShare,
+    kakaoShared: copy.kakaoShared,
     languageSwitchLabel: copy.languageSwitchLabel,
     placeholders: copy.placeholders,
     share: copy.share,

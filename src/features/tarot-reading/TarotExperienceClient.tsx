@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   buildPrompt,
   drawCards,
@@ -19,7 +19,17 @@ import { LanguageSwitch } from "./components/LanguageSwitch";
 import { ReadingResult } from "./components/ReadingResult";
 import { TopicSelector } from "./components/TopicSelector";
 import type { TarotReadingCopy } from "./i18n";
-import type { CopyState, ShareState } from "./types";
+import type { CopyState, KakaoShareState, ShareState } from "./types";
+
+const kakaoSdkScriptId = "kakao-javascript-sdk";
+const kakaoSdkScriptUrl =
+  "https://t1.kakaocdn.net/kakao_js_sdk/2.8.1/kakao.min.js";
+const kakaoSdkIntegrity =
+  "sha384-OL+ylM/iuPLtW5U3XcvLSGhE8JzReKDank5InqlHGWPhb4140/yrBw0bg0y7+C9J";
+const sharedReadingTopicParam = "topic";
+const sharedReadingCardsParam = "cards";
+
+let kakaoSdkLoadPromise: Promise<KakaoSdk> | undefined;
 
 type PublicPageLink = {
   readonly href: string;
@@ -29,16 +39,22 @@ type PublicPageLink = {
 type TarotExperienceClientProps = {
   readonly locale: Locale;
   readonly copy: TarotReadingCopy;
+  readonly kakaoAllowedOrigins: readonly string[];
+  readonly kakaoJavaScriptKey: string | undefined;
   readonly publicPageLinks: readonly PublicPageLink[];
   readonly publicPageNavigationLabel: string;
+  readonly shareSiteUrl: string;
   readonly tarotData: LocaleTarotData;
 };
 
 export function TarotExperienceClient({
   locale,
   copy,
+  kakaoAllowedOrigins,
+  kakaoJavaScriptKey,
   publicPageLinks,
   publicPageNavigationLabel,
+  shareSiteUrl,
   tarotData,
 }: TarotExperienceClientProps) {
   const defaultTopic = getDefaultTopic(tarotData.topics);
@@ -47,9 +63,57 @@ export function TarotExperienceClient({
   );
   const [cards, setCards] = useState<DrawnCard[]>([]);
   const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [kakaoShareState, setKakaoShareState] =
+    useState<KakaoShareState>("idle");
+  const [instagramCopyState, setInstagramCopyState] =
+    useState<CopyState>("idle");
+  const [urlCopyState, setUrlCopyState] = useState<CopyState>("idle");
   const [shareState, setShareState] = useState<ShareState>("idle");
+  const currentOrigin = useSyncExternalStore(
+    subscribeToCurrentOrigin,
+    getCurrentOriginSnapshot,
+    getServerOriginSnapshot,
+  );
+  const hasKakaoShare = canUseKakaoShare(
+    kakaoJavaScriptKey,
+    kakaoAllowedOrigins,
+    shareSiteUrl,
+    currentOrigin,
+  );
 
   const selectedTopic = getTopic(tarotData.topics, selectedTopicId);
+
+  useEffect(() => {
+    const sharedReading = getSharedReadingFromUrl(
+      tarotData,
+      window.location.href,
+    );
+
+    if (!sharedReading) {
+      return;
+    }
+
+    let shouldRestore = true;
+
+    queueMicrotask(() => {
+      if (!shouldRestore) {
+        return;
+      }
+
+      setSelectedTopicId(sharedReading.topicId);
+      setCards([...sharedReading.cards]);
+      setCopyState("idle");
+      setKakaoShareState("idle");
+      setInstagramCopyState("idle");
+      setUrlCopyState("idle");
+      setShareState("idle");
+    });
+
+    return () => {
+      shouldRestore = false;
+    };
+  }, [tarotData]);
+
   const prompt = useMemo(
     () =>
       cards.length > 0
@@ -78,7 +142,11 @@ export function TarotExperienceClient({
     setSelectedTopicId(topicId);
     setCards([]);
     setCopyState("idle");
+    setKakaoShareState("idle");
+    setInstagramCopyState("idle");
+    setUrlCopyState("idle");
     setShareState("idle");
+    clearSharedReadingUrl();
     trackEvent("topic_click", { locale, topic_id: topicId });
   }
 
@@ -88,7 +156,11 @@ export function TarotExperienceClient({
     const drawnCards = drawCards(tarotData.cards, tarotData.spreadPositions);
     setCards(drawnCards);
     setCopyState("idle");
+    setKakaoShareState("idle");
+    setInstagramCopyState("idle");
+    setUrlCopyState("idle");
     setShareState("idle");
+    replaceBrowserUrl(getBrowserReadingUrl(selectedTopic.id, drawnCards));
 
     drawnCards.forEach(({ position, card }) => {
       trackEvent("card_selected", {
@@ -123,39 +195,91 @@ export function TarotExperienceClient({
     }
   }
 
+  async function shareToKakaoTalk() {
+    if (cards.length === 0 || !kakaoJavaScriptKey) {
+      return;
+    }
+
+    if (
+      !canUseKakaoShare(
+        kakaoJavaScriptKey,
+        kakaoAllowedOrigins,
+        shareSiteUrl,
+        window.location.origin,
+      )
+    ) {
+      setKakaoShareState("failed");
+      return;
+    }
+
+    const shareText = getShareText(
+      copy.shareText,
+      selectedTopic.label,
+      cards,
+      `${locale} tarot-reading.shareText`,
+    );
+    const shareUrl = getShareUrl(shareSiteUrl, selectedTopic.id, cards);
+
+    setKakaoShareState("idle");
+    trackEvent("share_click", {
+      locale,
+      topic_id: selectedTopic.id,
+      card_count: cards.length,
+      method: "kakaotalk",
+    });
+
+    try {
+      const kakao = await getInitializedKakaoSdk(kakaoJavaScriptKey);
+
+      await Promise.resolve(
+        kakao.Share.sendDefault({
+          objectType: "text",
+          text: shareText,
+          link: {
+            mobileWebUrl: shareUrl,
+            webUrl: shareUrl,
+          },
+        }),
+      );
+      setKakaoShareState("opened");
+    } catch {
+      setKakaoShareState("failed");
+    }
+  }
+
   async function shareReading() {
     if (cards.length === 0) {
       return;
     }
 
-    const shareText = formatTemplateStrict(
+    const shareText = getShareText(
       copy.shareText,
-      {
-        cardNames: cards.map(({ card }) => card.name).join(", "),
-        topicLabel: selectedTopic.label,
-      },
+      selectedTopic.label,
+      cards,
       `${locale} tarot-reading.shareText`,
     );
-    const canNativeShare = Boolean(navigator.share);
+    const shareUrl = getShareUrl(shareSiteUrl, selectedTopic.id, cards);
+    const shareData = {
+      title: copy.shareTitle,
+      text: shareText,
+      url: shareUrl,
+    } satisfies ShareData;
+    const canShare = canNativeShare(shareData);
 
     setShareState("idle");
     trackEvent("share_click", {
       locale,
       topic_id: selectedTopic.id,
       card_count: cards.length,
-      method: canNativeShare ? "native" : "clipboard",
+      method: canShare ? "native" : "clipboard",
     });
 
     try {
-      if (canNativeShare) {
-        await navigator.share({
-          title: copy.shareTitle,
-          text: shareText,
-          url: window.location.href,
-        });
+      if (canShare && navigator.share) {
+        await navigator.share(shareData);
         setShareState("shared");
       } else {
-        await writeClipboard(`${shareText}\n${window.location.href}`);
+        await writeClipboard(`${shareText}\n${shareUrl}`);
         setShareState("copied");
       }
     } catch (error) {
@@ -165,6 +289,48 @@ export function TarotExperienceClient({
       }
 
       setShareState("failed");
+    }
+  }
+
+  async function copyShareUrl() {
+    if (cards.length === 0) {
+      return;
+    }
+
+    setUrlCopyState("idle");
+    trackEvent("share_click", {
+      locale,
+      topic_id: selectedTopic.id,
+      card_count: cards.length,
+      method: "copy_url",
+    });
+
+    try {
+      await writeClipboard(getShareUrl(shareSiteUrl, selectedTopic.id, cards));
+      setUrlCopyState("copied");
+    } catch {
+      setUrlCopyState("failed");
+    }
+  }
+
+  async function copyInstagramShareUrl() {
+    if (cards.length === 0) {
+      return;
+    }
+
+    setInstagramCopyState("idle");
+    trackEvent("share_click", {
+      locale,
+      topic_id: selectedTopic.id,
+      card_count: cards.length,
+      method: "instagram_copy_url",
+    });
+
+    try {
+      await writeClipboard(getShareUrl(shareSiteUrl, selectedTopic.id, cards));
+      setInstagramCopyState("copied");
+    } catch {
+      setInstagramCopyState("failed");
     }
   }
 
@@ -221,11 +387,18 @@ export function TarotExperienceClient({
             cards={cards}
             copy={copy}
             copyState={copyState}
+            hasKakaoShare={hasKakaoShare}
+            instagramCopyState={instagramCopyState}
+            kakaoShareState={kakaoShareState}
+            onInstagramShare={copyInstagramShareUrl}
+            onKakaoShare={shareToKakaoTalk}
             onCopyPrompt={copyPrompt}
+            onCopyUrl={copyShareUrl}
             onShareReading={shareReading}
             prompt={prompt}
             selectedTopic={selectedTopic}
             shareState={shareState}
+            urlCopyState={urlCopyState}
           />
 
           <p className="text-xs leading-5 text-stone-400">{copy.disclaimer}</p>
@@ -295,4 +468,247 @@ function getErrorName(error: unknown) {
 
   const { name } = error;
   return typeof name === "string" ? name : "";
+}
+
+function getShareText(
+  shareTextTemplate: string,
+  topicLabel: string,
+  cards: readonly DrawnCard[],
+  context: string,
+) {
+  return formatTemplateStrict(
+    shareTextTemplate,
+    {
+      cardNames: cards.map(({ card }) => card.name).join(", "),
+      topicLabel,
+    },
+    context,
+  );
+}
+
+function getBrowserReadingUrl(topicId: TopicId, cards: readonly DrawnCard[]) {
+  return buildSharedReadingUrl(window.location.href, topicId, cards);
+}
+
+function getShareUrl(
+  shareSiteUrl: string,
+  topicId: TopicId,
+  cards: readonly DrawnCard[],
+) {
+  return buildSharedReadingUrl(
+    getShareBaseUrl(shareSiteUrl, window.location.href),
+    topicId,
+    cards,
+  );
+}
+
+function getShareBaseUrl(shareSiteUrl: string, currentHref: string) {
+  const currentUrl = new URL(currentHref);
+  const shareBaseUrl = new URL(shareSiteUrl);
+
+  return new URL(
+    `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`,
+    shareBaseUrl,
+  ).toString();
+}
+
+function canUseKakaoShare(
+  kakaoJavaScriptKey: string | undefined,
+  kakaoAllowedOrigins: readonly string[],
+  shareSiteUrl: string,
+  currentOrigin: string,
+) {
+  if (!kakaoJavaScriptKey || !currentOrigin) {
+    return false;
+  }
+
+  try {
+    return (
+      kakaoAllowedOrigins.includes(new URL(currentOrigin).origin) &&
+      kakaoAllowedOrigins.includes(new URL(shareSiteUrl).origin)
+    );
+  } catch {
+    return false;
+  }
+}
+
+function subscribeToCurrentOrigin(onStoreChange: () => void) {
+  window.addEventListener("hashchange", onStoreChange);
+  window.addEventListener("popstate", onStoreChange);
+
+  return () => {
+    window.removeEventListener("hashchange", onStoreChange);
+    window.removeEventListener("popstate", onStoreChange);
+  };
+}
+
+function getCurrentOriginSnapshot() {
+  return window.location.origin;
+}
+
+function getServerOriginSnapshot() {
+  return "";
+}
+
+function buildSharedReadingUrl(
+  href: string,
+  topicId: TopicId,
+  cards: readonly DrawnCard[],
+) {
+  const url = new URL(href);
+  url.searchParams.set(sharedReadingTopicParam, topicId);
+  url.searchParams.set(
+    sharedReadingCardsParam,
+    cards.map(({ card }) => card.id).join(","),
+  );
+
+  return url.toString();
+}
+
+function clearSharedReadingUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete(sharedReadingTopicParam);
+  url.searchParams.delete(sharedReadingCardsParam);
+  replaceBrowserUrl(url.toString());
+}
+
+function replaceBrowserUrl(url: string) {
+  window.history.replaceState(null, "", url);
+}
+
+function getSharedReadingFromUrl(
+  tarotData: LocaleTarotData,
+  href: string,
+): SharedReading | undefined {
+  const url = new URL(href);
+  const topicId = url.searchParams.get(sharedReadingTopicParam);
+  const topic = tarotData.topics.find((candidate) => candidate.id === topicId);
+  const cardsParam = url.searchParams.get(sharedReadingCardsParam);
+
+  if (!topic || !cardsParam) {
+    return undefined;
+  }
+
+  const cardIds = cardsParam.split(",");
+
+  if (
+    cardIds.length !== tarotData.spreadPositions.length ||
+    new Set(cardIds).size !== cardIds.length
+  ) {
+    return undefined;
+  }
+
+  const cards: DrawnCard[] = [];
+
+  for (const [index, cardId] of cardIds.entries()) {
+    const position = tarotData.spreadPositions[index];
+    const card = tarotData.cards.find((candidate) => candidate.id === cardId);
+
+    if (!position || !card) {
+      return undefined;
+    }
+
+    cards.push({ position, card });
+  }
+
+  return {
+    cards,
+    topicId: topic.id,
+  };
+}
+
+function canNativeShare(shareData: ShareData) {
+  if (typeof navigator.share !== "function") {
+    return false;
+  }
+
+  return !navigator.canShare || navigator.canShare(shareData);
+}
+
+async function getInitializedKakaoSdk(javaScriptKey: string) {
+  const kakao = await loadKakaoSdk();
+
+  if (!kakao.isInitialized()) {
+    kakao.init(javaScriptKey);
+  }
+
+  return kakao;
+}
+
+async function loadKakaoSdk() {
+  if (window.Kakao) {
+    return window.Kakao;
+  }
+
+  kakaoSdkLoadPromise =
+    kakaoSdkLoadPromise ??
+    new Promise<KakaoSdk>((resolve, reject) => {
+      const existingScript = document.getElementById(kakaoSdkScriptId);
+
+      if (existingScript) {
+        existingScript.addEventListener("load", () => {
+          resolveLoadedKakaoSdk(resolve, reject);
+        });
+        existingScript.addEventListener("error", reject);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.crossOrigin = "anonymous";
+      script.id = kakaoSdkScriptId;
+      script.integrity = kakaoSdkIntegrity;
+      script.src = kakaoSdkScriptUrl;
+      script.addEventListener("load", () => {
+        resolveLoadedKakaoSdk(resolve, reject);
+      });
+      script.addEventListener("error", reject);
+
+      document.head.append(script);
+    }).catch((error: unknown) => {
+      kakaoSdkLoadPromise = undefined;
+      document.getElementById(kakaoSdkScriptId)?.remove();
+      throw error;
+    });
+
+  return kakaoSdkLoadPromise;
+}
+
+function resolveLoadedKakaoSdk(
+  resolve: (kakao: KakaoSdk) => void,
+  reject: (reason?: unknown) => void,
+) {
+  if (window.Kakao) {
+    resolve(window.Kakao);
+    return;
+  }
+
+  reject(new Error("Kakao JavaScript SDK did not attach to window."));
+}
+
+type KakaoSdk = {
+  readonly Share: {
+    readonly sendDefault: (args: KakaoTextShareArgs) => unknown;
+  };
+  readonly init: (javaScriptKey: string) => void;
+  readonly isInitialized: () => boolean;
+};
+
+type KakaoTextShareArgs = {
+  readonly objectType: "text";
+  readonly text: string;
+  readonly link: {
+    readonly mobileWebUrl: string;
+    readonly webUrl: string;
+  };
+};
+
+type SharedReading = {
+  readonly cards: readonly DrawnCard[];
+  readonly topicId: TopicId;
+};
+
+declare global {
+  interface Window {
+    Kakao?: KakaoSdk;
+  }
 }
