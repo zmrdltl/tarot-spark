@@ -2,8 +2,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { spreadPositionIds, tarotCardIds, topicIds } from "@/domain/tarot";
+import { publicPageIds } from "@/features/public-pages";
+import enPublicPages from "@/messages/en/public-pages.json";
 import enTarotMessages from "@/messages/en/tarot-domain.json";
 import enCopy from "@/messages/en/tarot-reading.json";
+import koPublicPages from "@/messages/ko/public-pages.json";
 import koTarotMessages from "@/messages/ko/tarot-domain.json";
 import koCopy from "@/messages/ko/tarot-reading.json";
 import {
@@ -25,6 +28,11 @@ const tarotMessagesByLocale = {
   ko: koTarotMessages,
 } satisfies Record<Locale, unknown>;
 
+const publicPageMessagesByLocale = {
+  en: enPublicPages,
+  ko: koPublicPages,
+} satisfies Record<Locale, unknown>;
+
 const jsonFiles = [
   {
     label: "messages/en/tarot-reading.json",
@@ -41,6 +49,14 @@ const jsonFiles = [
   {
     label: "messages/ko/tarot-domain.json",
     path: "src/messages/ko/tarot-domain.json",
+  },
+  {
+    label: "messages/en/public-pages.json",
+    path: "src/messages/en/public-pages.json",
+  },
+  {
+    label: "messages/ko/public-pages.json",
+    path: "src/messages/ko/public-pages.json",
   },
 ] as const;
 
@@ -111,12 +127,37 @@ const tarotMessagesSchema = {
   }),
 } satisfies JsonSchema;
 
+const publicPageMessagesSchema = {
+  brand: "string",
+  homeLabel: "string",
+  languageSwitchLabel: "string",
+  pageNavigationLabel: "string",
+  pages: exactRecordSchema(publicPageIds, {
+    metadata: {
+      title: "string",
+      description: "string",
+    },
+    linkLabel: "string",
+    title: "string",
+    intro: "string",
+    sections: [
+      {
+        heading: "string",
+        paragraphs: ["string"],
+      },
+    ],
+  }),
+} satisfies JsonSchema;
+
 describe("i18n integrity", () => {
   it("keeps locale files aligned with supported locales", () => {
     expect(Object.keys(uiCopyByLocale).sort()).toEqual(
       [...supportedLocales].sort(),
     );
     expect(Object.keys(tarotMessagesByLocale).sort()).toEqual(
+      [...supportedLocales].sort(),
+    );
+    expect(Object.keys(publicPageMessagesByLocale).sort()).toEqual(
       [...supportedLocales].sort(),
     );
   });
@@ -138,6 +179,12 @@ describe("i18n integrity", () => {
     );
   });
 
+  it("keeps public page message keys identical across locales", () => {
+    expect(collectShapePaths(koPublicPages)).toEqual(
+      collectShapePaths(enPublicPages),
+    );
+  });
+
   it("matches supported locale JSON schemas exactly", () => {
     const schemaErrors = [
       ...collectLocaleSchemaErrors(uiCopyByLocale, uiCopySchema, "$.uiCopy"),
@@ -145,6 +192,11 @@ describe("i18n integrity", () => {
         tarotMessagesByLocale,
         tarotMessagesSchema,
         "$.tarotMessages",
+      ),
+      ...collectLocaleSchemaErrors(
+        publicPageMessagesByLocale,
+        publicPageMessagesSchema,
+        "$.publicPageMessages",
       ),
     ];
 
@@ -218,6 +270,10 @@ describe("i18n integrity", () => {
     const blankStrings = [
       ...collectBlankStringPaths(uiCopyByLocale, "$.uiCopyByLocale"),
       ...collectBlankStringPaths(tarotMessagesByLocale, "$.tarotMessages"),
+      ...collectBlankStringPaths(
+        publicPageMessagesByLocale,
+        "$.publicPageMessages",
+      ),
     ];
 
     expect(blankStrings).toEqual([]);
