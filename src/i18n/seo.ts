@@ -13,6 +13,7 @@ type AlternateLanguageUrls = Record<Locale | "x-default", string>;
 export function getSiteUrl(): URL {
   return normalizeSiteUrl(
     process.env["NEXT_PUBLIC_SITE_URL"] ??
+      getVercelSiteOrigin(process.env["VERCEL_PROJECT_PRODUCTION_URL"]) ??
       getVercelSiteOrigin(process.env["VERCEL_URL"]) ??
       fallbackSiteOrigin,
   );
