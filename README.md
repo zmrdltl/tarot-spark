@@ -18,6 +18,19 @@ pnpm exec playwright install chromium
 pnpm dev
 ```
 
+## Configuration
+
+Set `NEXT_PUBLIC_SITE_URL` to the production origin before deployment. It is used
+for canonical URLs, alternate language links, `robots.txt`, and `sitemap.xml`.
+Local builds fall back to `http://localhost:3000`.
+
+Set `NEXT_PUBLIC_GA_ID` to the Google Analytics measurement ID, such as
+`G-XXXXXXXXXX`, to enable page view tracking and tarot behavior events. Leave it
+unset for local development or preview deployments that should not send GA data.
+
+Use `.env.local` for local values. The committed `.env.example` file documents
+the expected keys.
+
 ## Documentation
 
 - [Docs map](docs/README.md)
