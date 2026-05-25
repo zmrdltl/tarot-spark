@@ -47,6 +47,10 @@ describe("Home", () => {
     expect(
       screen.getByText(/entertainment and self-reflection only/i),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+      "href",
+      "/privacy",
+    );
   });
 
   it("renders Korean localized content", () => {
@@ -63,6 +67,10 @@ describe("Home", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(/의료, 법률, 재정/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "개인정보" })).toHaveAttribute(
+      "href",
+      "/ko/privacy",
+    );
   });
 
   it("draws cards and generates a copyable prompt", () => {
