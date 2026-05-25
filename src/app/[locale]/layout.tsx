@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { isPrefixedLocale } from "@/i18n/config";
 import "../globals.css";
 
@@ -21,7 +22,10 @@ export default async function LocaleRootLayout({
 
   return (
     <html lang={rawLocale}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   );
 }
