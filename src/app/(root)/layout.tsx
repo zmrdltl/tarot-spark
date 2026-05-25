@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { getTarotReadingMetadata } from "@/features/tarot-reading";
 import { defaultLocale } from "@/i18n/config";
 import "../globals.css";
@@ -12,7 +13,10 @@ export default function RootHomeLayout({
 }>) {
   return (
     <html lang={defaultLocale}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <GoogleAnalytics />
+      </body>
     </html>
   );
 }
