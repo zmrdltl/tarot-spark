@@ -1,0 +1,143 @@
+{
+  "brand": "tarot-spark",
+  "homeLabel": "Free tarot prompt generator",
+  "languageSwitchLabel": "Choose language",
+  "pageNavigationLabel": "Public pages",
+  "pages": {
+    "about": {
+      "metadata": {
+        "title": "About tarot-spark",
+        "description": "Learn what tarot-spark is, how the free tarot prompt generator works, and what boundaries apply."
+      },
+      "linkLabel": "About",
+      "title": "About tarot-spark",
+      "intro": "tarot-spark is a free tarot card drawing and AI prompt generator for reflective writing.",
+      "sections": [
+        {
+          "heading": "What this site does",
+          "paragraphs": [
+            "You can choose a topic, draw a compact three-card spread, and copy a prompt that helps you write about the result in an AI tool.",
+            "The experience is built for entertainment, journaling, and self-reflection rather than prediction or professional advice."
+          ]
+        },
+        {
+          "heading": "How the readings work",
+          "paragraphs": [
+            "Each draw uses local tarot card and spread data. The site does not ask for your name, birth date, contact details, or a personal question.",
+            "The generated prompt is meant to help you explore symbols and possible perspectives. You decide what is useful and what to ignore."
+          ]
+        },
+        {
+          "heading": "Project status",
+          "paragraphs": [
+            "tarot-spark is an early MVP. More topics, clearer guide content, and improved sharing may be added as the product matures.",
+            "Feedback can be sent to tarotspark.app@gmail.com."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "metadata": {
+        "title": "Privacy Policy | tarot-spark",
+        "description": "Read how tarot-spark handles analytics, browser features, and contact messages."
+      },
+      "linkLabel": "Privacy",
+      "title": "Privacy Policy",
+      "intro": "This policy explains what tarot-spark collects and how the site is designed to avoid personal tarot inputs.",
+      "sections": [
+        {
+          "heading": "Information you provide",
+          "paragraphs": [
+            "tarot-spark does not require an account and does not ask for names, birth dates, contact details, or free-form personal questions to generate a prompt.",
+            "If you email tarotspark.app@gmail.com, the email address and message content you send are used to read and respond to your message."
+          ]
+        },
+        {
+          "heading": "Analytics",
+          "paragraphs": [
+            "When Google Analytics is enabled, the site may collect page views and behavior events such as topic clicks, card draws, result views, prompt copies, and share clicks.",
+            "Analytics payloads are limited to stable event details such as locale, topic id, card count, and card ids. They are not designed to include names, birth dates, contact details, or personal questions."
+          ]
+        },
+        {
+          "heading": "Browser features",
+          "paragraphs": [
+            "Prompt copy and share actions use browser clipboard or share features. The prompt text stays in your browser unless you choose to copy, share, or paste it elsewhere.",
+            "tarot-spark does not run server-generated AI readings for the MVP."
+          ]
+        },
+        {
+          "heading": "Third-party services",
+          "paragraphs": [
+            "The site may be hosted on Vercel and may use Google Analytics when a measurement id is configured.",
+            "Those providers process technical and analytics data according to their own terms and privacy policies."
+          ]
+        },
+        {
+          "heading": "Contact",
+          "paragraphs": [
+            "For privacy questions or deletion requests related to emails you sent, contact tarotspark.app@gmail.com.",
+            "Last updated: May 25, 2026."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "metadata": {
+        "title": "Contact tarot-spark",
+        "description": "Contact tarot-spark about feedback, privacy questions, or site issues."
+      },
+      "linkLabel": "Contact",
+      "title": "Contact",
+      "intro": "Use email for feedback, privacy questions, or site issues related to tarot-spark.",
+      "sections": [
+        {
+          "heading": "Email",
+          "paragraphs": [
+            "Send messages to tarotspark.app@gmail.com.",
+            "Include the page or feature you are referring to when reporting a site issue."
+          ]
+        },
+        {
+          "heading": "Response scope",
+          "paragraphs": [
+            "tarot-spark can respond to product feedback, accessibility issues, privacy questions, and bug reports.",
+            "Do not use this contact channel for urgent medical, legal, financial, investment, mental-health, or safety decisions."
+          ]
+        }
+      ]
+    },
+    "disclaimer": {
+      "metadata": {
+        "title": "Disclaimer | tarot-spark",
+        "description": "Read the entertainment and self-reflection disclaimer for tarot-spark."
+      },
+      "linkLabel": "Disclaimer",
+      "title": "Disclaimer",
+      "intro": "tarot-spark is for entertainment and self-reflection only.",
+      "sections": [
+        {
+          "heading": "No professional advice",
+          "paragraphs": [
+            "Tarot content, prompts, card meanings, and reflections on this site are not medical, legal, financial, investment, mental-health, or other professional advice.",
+            "Do not rely on tarot-spark for decisions that require a qualified professional."
+          ]
+        },
+        {
+          "heading": "No guaranteed outcomes",
+          "paragraphs": [
+            "Tarot interpretations are symbolic and subjective. They may be incomplete, inaccurate, or not useful for your situation.",
+            "You are responsible for how you use, copy, share, or interpret generated prompts."
+          ]
+        },
+        {
+          "heading": "Use boundaries",
+          "paragraphs": [
+            "If a topic involves safety, health, legal obligations, money, investments, or emotional crisis, seek appropriate professional support instead of relying on tarot content.",
+            "The site is intended for general reflection, creative writing, and light personal insight."
+          ]
+        }
+      ]
+    }
+  }
+}
