@@ -7,16 +7,23 @@ import {
 } from "./seo";
 
 const originalSiteUrl = process.env["NEXT_PUBLIC_SITE_URL"];
+const originalVercelProjectProductionUrl =
+  process.env["VERCEL_PROJECT_PRODUCTION_URL"];
 const originalVercelUrl = process.env["VERCEL_URL"];
 
 describe("i18n SEO", () => {
   afterEach(() => {
     restoreEnv("NEXT_PUBLIC_SITE_URL", originalSiteUrl);
+    restoreEnv(
+      "VERCEL_PROJECT_PRODUCTION_URL",
+      originalVercelProjectProductionUrl,
+    );
     restoreEnv("VERCEL_URL", originalVercelUrl);
   });
 
   it("falls back to the local origin when no site origin is configured", () => {
     delete process.env["NEXT_PUBLIC_SITE_URL"];
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
     expect(getSiteUrl().toString()).toBe("http://localhost:3000/");
@@ -26,6 +33,7 @@ describe("i18n SEO", () => {
   it("normalizes configured site origins for locale urls", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] =
       "https://example.com///?draft=true#top";
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
     expect(getSiteUrl().toString()).toBe("https://example.com/");
@@ -33,8 +41,19 @@ describe("i18n SEO", () => {
     expect(getAbsoluteLocaleUrl("ko")).toBe("https://example.com/ko");
   });
 
-  it("uses Vercel's deployment origin when a site origin is not configured", () => {
+  it("prefers Vercel's production origin over the deployment origin", () => {
     delete process.env["NEXT_PUBLIC_SITE_URL"];
+    process.env["VERCEL_PROJECT_PRODUCTION_URL"] = "tarot-spark.vercel.app";
+    process.env["VERCEL_URL"] = "tarot-spark-e7dnbeeaa-tarotspark.vercel.app";
+
+    expect(getAbsoluteLocaleUrl("ko")).toBe(
+      "https://tarot-spark.vercel.app/ko",
+    );
+  });
+
+  it("uses Vercel's deployment origin when no production origin is available", () => {
+    delete process.env["NEXT_PUBLIC_SITE_URL"];
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     process.env["VERCEL_URL"] = "tarot-spark.vercel.app";
 
     expect(getAbsoluteLocaleUrl("ko")).toBe(
@@ -44,6 +63,7 @@ describe("i18n SEO", () => {
 
   it("builds absolute alternate language urls", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
     expect(getAbsoluteAlternateLanguageUrls()).toEqual({
@@ -55,6 +75,7 @@ describe("i18n SEO", () => {
 
   it("adds canonical and hreflang metadata to localized pages", () => {
     process.env["NEXT_PUBLIC_SITE_URL"] = "https://example.com";
+    delete process.env["VERCEL_PROJECT_PRODUCTION_URL"];
     delete process.env["VERCEL_URL"];
 
     expect(
