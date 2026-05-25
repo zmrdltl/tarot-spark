@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   buildPrompt,
@@ -20,15 +21,24 @@ import { TopicSelector } from "./components/TopicSelector";
 import type { TarotReadingCopy } from "./i18n";
 import type { CopyState, ShareState } from "./types";
 
+type PublicPageLink = {
+  readonly href: string;
+  readonly label: string;
+};
+
 type TarotExperienceClientProps = {
   readonly locale: Locale;
   readonly copy: TarotReadingCopy;
+  readonly publicPageLinks: readonly PublicPageLink[];
+  readonly publicPageNavigationLabel: string;
   readonly tarotData: LocaleTarotData;
 };
 
 export function TarotExperienceClient({
   locale,
   copy,
+  publicPageLinks,
+  publicPageNavigationLabel,
   tarotData,
 }: TarotExperienceClientProps) {
   const defaultTopic = getDefaultTopic(tarotData.topics);
@@ -221,6 +231,22 @@ export function TarotExperienceClient({
           <p className="text-xs leading-5 text-stone-400">{copy.disclaimer}</p>
         </section>
       </section>
+      <footer className="mx-auto w-full max-w-6xl px-5 pb-8 sm:px-8">
+        <nav
+          aria-label={publicPageNavigationLabel}
+          className="flex flex-wrap justify-center gap-3 text-xs text-stone-400 sm:justify-start"
+        >
+          {publicPageLinks.map((link) => (
+            <Link
+              className="transition hover:text-emerald-200"
+              href={link.href}
+              key={link.href}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      </footer>
     </main>
   );
 }

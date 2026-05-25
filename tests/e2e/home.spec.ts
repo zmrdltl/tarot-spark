@@ -25,6 +25,44 @@ test("loads Korean localized content", async ({ page }) => {
   await expect(page.getByRole("button", { name: "카드 뽑기" })).toBeVisible();
 });
 
+test("links required public pages in both languages", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("link", { name: "About" })).toHaveAttribute(
+    "href",
+    "/about",
+  );
+  await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute(
+    "href",
+    "/privacy",
+  );
+  await expect(page.getByRole("link", { name: "Contact" })).toHaveAttribute(
+    "href",
+    "/contact",
+  );
+  await expect(page.getByRole("link", { name: "Disclaimer" })).toHaveAttribute(
+    "href",
+    "/disclaimer",
+  );
+
+  await page.getByRole("link", { name: "Privacy" }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Privacy Policy",
+    }),
+  ).toBeVisible();
+  await expect(page).toHaveTitle("Privacy Policy | tarot-spark");
+
+  await page.goto("/ko");
+  await page.getByRole("link", { name: "개인정보" }).click();
+  await expect(
+    page.getByRole("heading", {
+      name: "개인정보 처리방침",
+    }),
+  ).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "ko");
+});
+
 test("serves Korean html lang before hydration", async ({ request }) => {
   const response = await request.get("/ko");
   const html = await response.text();
@@ -37,9 +75,11 @@ test("returns 404 for unsupported or duplicate locale paths", async ({
 }) => {
   const unsupportedLocaleResponse = await request.get("/fr");
   const duplicateDefaultLocaleResponse = await request.get("/en");
+  const unsupportedPublicPageResponse = await request.get("/ko/terms");
 
   expect(unsupportedLocaleResponse.status()).toBe(404);
   expect(duplicateDefaultLocaleResponse.status()).toBe(404);
+  expect(unsupportedPublicPageResponse.status()).toBe(404);
 });
 
 test("resets reading state when switching languages", async ({ page }) => {
